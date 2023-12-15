@@ -17,7 +17,7 @@ const getMovie = (req, res, next) => {
 const getMovies = (req, res, next) => {
     try {
         const {genre} = req.params;
-        if (genre) res.send({movies: Movie.getMovies(genre)})
+        if (genre) res.send({movies: Movie.getMovies(genre.toLowerCase())})
         else res.status(200).json({movies: Movie.getMovies()})
     }
     catch (e) {

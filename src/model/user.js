@@ -61,10 +61,15 @@ class User {
     static getUserMovies(email) {
         try {
             const movies = Movie.getMovies()
-            console.log(movies)
-            const filteredMovies = movies.filter(movie=>movie.ratings.email === email)
-            console.log(filteredMovies)
-            return filteredMovies
+            const rated = []
+            movies.forEach(movie=>{
+                movie.ratings.forEach(rating=>{
+                    if (rating.email===email) {
+                        rated.push(movie)
+                    }
+                })
+            })
+            return rated
         }
 
         catch(e) {

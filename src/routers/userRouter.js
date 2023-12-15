@@ -8,7 +8,7 @@ router.use(authenticateToken)
 
 router.delete("/", userController.deleteUser)
 
-router.get("/movies", userController.getUserMovies)
+router.get("/rated", userController.getUserMovies)
 
 
 export default router;
