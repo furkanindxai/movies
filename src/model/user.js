@@ -3,7 +3,7 @@ import validator from 'validator';
 
 import hashPassword from '../helpers/hashPassword.js';
 
-
+import Movie from "./movie.js"
 class User {
     #email;
     #password;
@@ -19,7 +19,7 @@ class User {
         }
     }
 
-    static #saveUsers(users) {
+    static saveUsers(users) {
         try {
             const dataJSON = JSON.stringify(users);
             fs.writeFileSync('../data/Users.json', dataJSON);
@@ -37,7 +37,7 @@ class User {
             if (!userExists) throw new Error("User doesn't exist!");
 
             const newUsers = users.filter(user=> email !== user.email);
-            User.#saveUsers(newUsers);
+            User.saveUsers(newUsers);
         }
         catch (e) {
             console.log(e)
@@ -50,18 +50,25 @@ class User {
             const users = User.loadUsers(); 
             let userExists = users.find((user) => user.email === email)
             if (!userExists) throw new Error("User doesn't exist!");
-            return userAlreadyExists
+            return userExists
         }
 
         catch (e) {
             console.log(e);
         }
     }
-    // static addRating(email, movieTitle, rating) {
 
-    // }
+    static getUserMovies(email) {
+        try {
+            const movies = Movie.getMovies()
+            const filteredMovies = movies.filter(movie=>movie.ratings.email === email)
+            return filteredMovies
+        }
 
-    
+        catch(e) {
+            console.log(e)
+        }
+    }
 
     constructor(email, password) {
         if (!validator.isEmail(email)) throw Error("Invalid email!");
@@ -73,19 +80,6 @@ class User {
 
         if (userAlreadyExists) throw Error("User is already registered!")
 
-
-        // if (!name) { //user is trying to login
-        //     const invalidCreds = !userAlreadyExists || !bcrypt.compareSync(password, userAlreadyExists.password)
-            
-        //     if (invalidCreds) throw Error("Invalid credentials!")
-        //     else {
-        //         this.#email = email;
-        //         this.#password = password;
-        //         this.#rated = userAlreadyExists.rated;
-        //         console.log(this.#email)
-        //     }
-        // }
-        
         else {
             if (!password) throw new Error("Password field can't be blank!");
             this.#email = email;
@@ -95,7 +89,7 @@ class User {
         
     
             users.push(newUser)
-            User.#saveUsers(users)
+            User.saveUsers(users)
         }
        
     }
@@ -103,5 +97,6 @@ class User {
 
   
 }
+
 
 export default User
