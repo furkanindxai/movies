@@ -3,7 +3,7 @@
 
 1 . Go the src directory.
 ```bash
-  cd path_to_movies
+  cd path_to_movies/src
 ```
 
 2 . Install dependencies
