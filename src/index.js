@@ -24,9 +24,8 @@ app.use((req, res) => {
               'status':404,
               'message':'Invalid Request',
               'statusCode':404,
-              'stack':'http://localhost:8081/'
             },
-             message: 'Testing!'
+             message: 'Invalid route!'
           });
     });
 

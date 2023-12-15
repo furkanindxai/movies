@@ -6,7 +6,7 @@ import authenticateToken from "../middleware/authenticateToken.js";
 const router = new express.Router();
 router.use(authenticateToken)
 
-router.delete("/:email", userController.deleteUser)
+router.delete("/", userController.deleteUser)
 
 router.get("/movies", userController.getUserMovies)
 

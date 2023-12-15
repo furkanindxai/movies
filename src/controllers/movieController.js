@@ -3,7 +3,8 @@ import User from "../model/user.js";
 
 const getMovie = (req, res, next) => {
    try { 
-        const {title} = req.params;
+        let {title} = req.params;
+        title = title.replace("_", " ");
         const movie = Movie.getMovie(title);
         res.status(200).json({title: movie})
     }
