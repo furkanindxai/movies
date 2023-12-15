@@ -40,41 +40,6 @@ class Movie {
         }
     }
 
-    static rateMovie(title, rating ,email ) {
-        try {
-            if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
-            const movie = Movie.getMovie(title);
-            const user = User.getUser(email);
-            if (user.rated.includes(title)) {
-                user.rated = user.rated.filter(rated=>rated!=title)
-            }
-            user.rated.push(title)
-            let indOfRating = -1;
-            movie.ratings.map((rating,i) => {
-                if (rating.email === email) indOfRating = i;
-            })
-            if (indOfRating === -1) movie.ratings.push({email, rating})
-            else movie.ratings[indOfRating] = {email, rating}
-            const movies = Movie.loadMovies();
-            const newMovies = movies.map(movieFromArray=>{
-                if (movieFromArray.title === title) return movie
-                return movieFromArray
-            })
-            Movie.saveMovies(newMovies)
-            const users = User.loadUsers()
-            const newUsers = users.map(userFromArray=> {
-                if (userFromArray.email === email) return user
-                return userFromArray
-            })
-            User.saveUsers(newUsers)
-        }
-        
-        catch (e) {
-            console.log(e)
-        }
-
-    }
-
     static getRating(title) {
         const movie = Movie.getMovie(title)
         const sum = movie.ratings.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0)
