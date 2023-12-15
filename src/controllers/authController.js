@@ -31,7 +31,7 @@ const login = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.sendStatus(401)
     }
 
 }

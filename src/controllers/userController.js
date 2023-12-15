@@ -13,8 +13,8 @@ const deleteUser = (req, res, next) => {
 }
 
 const getUserMovies = (req, res, next) => {
-    const email = req.email;
-    const movies = User.getMovies(email)
+    const email = req.email.email;
+    const movies = User.getUserMovies(email)
     res.status(200).send({movies})
 }
 

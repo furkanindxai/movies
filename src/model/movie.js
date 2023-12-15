@@ -82,7 +82,7 @@ class Movie {
     }
 
     static getMovies(genre="all") {
-        const movies = loadMovies()
+        const movies = Movie.loadMovies()
         
         if (genre === "all") {
             return movies

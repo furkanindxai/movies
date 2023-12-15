@@ -53,9 +53,9 @@ const getRating = (req, res, next) => {
 
 const searchMovie = (req, res, next) => {
     try {
-        const {title} = req.query;
+        const {title} = req.params;
         const movies = Movie.getMovies();
-        const matches = movies.filter(movie=>movie.title.includes(title))
+        const matches = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
         res.status(200).json({movies: matches})
     }
     catch (e) {
@@ -66,13 +66,12 @@ const searchMovie = (req, res, next) => {
 const rateMovie = (req, res, next) => {
     try {
         const {title, rating} = req.body;
-        const email = req.query;
+        const email = req.email.email;
        
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
        
         const movie = Movie.getMovie(title);
         const user = User.getUser(email);
-       
         if (user.rated.includes(title)) {
             user.rated = user.rated.filter(rated=>rated!=title)
         }

@@ -61,7 +61,9 @@ class User {
     static getUserMovies(email) {
         try {
             const movies = Movie.getMovies()
+            console.log(movies)
             const filteredMovies = movies.filter(movie=>movie.ratings.email === email)
+            console.log(filteredMovies)
             return filteredMovies
         }
 

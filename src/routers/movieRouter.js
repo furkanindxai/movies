@@ -12,11 +12,10 @@ router.post("/", movieController.addMovie)
 router.get("/", movieController.getMovies)
 
 router.get("/genres/:genre", movieController.getMovies)
-
+router.get("/search/:title", movieController.searchMovie)
+router.post("/rate", movieController.rateMovie)
 router.get("/:title", movieController.getMovie)
 
-router.get("/search/:title", movieController.searchMovie)
 
-router.post("/rate", movieController.rateMovie)
 
 export default router;
