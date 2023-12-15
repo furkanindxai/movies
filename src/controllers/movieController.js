@@ -72,6 +72,7 @@ const rateMovie = (req, res, next) => {
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
        
         const movie = Movie.getMovie(title);
+        if (!movie) throw("Movie not in database!")
         const user = User.getUser(email);
         if (user.rated.includes(title)) {
             user.rated = user.rated.filter(rated=>rated!=title)
@@ -79,6 +80,7 @@ const rateMovie = (req, res, next) => {
        
         user.rated.push(title)
         let indOfRating = -1;
+        
         movie.ratings.map((rating,i) => {
             if (rating.email === email) indOfRating = i;
         })
