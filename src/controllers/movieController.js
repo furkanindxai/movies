@@ -49,7 +49,7 @@ const getRating = (req, res, next) => {
         let {title} = req.params;
         title = title.replaceAll("_", " ");
         const rating = Movie.getRating(title)
-        if (!rating) throw new Error("Movie doesn't exist in the database!")
+        if (!rating) throw new Error("Movie doesn't exist in the database or hasnt been rated yet!")
         else res.status(200).json({rating})
     }
     catch (e) {
