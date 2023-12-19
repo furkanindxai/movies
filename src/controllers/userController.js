@@ -7,16 +7,20 @@ const deleteUser = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message: e.message})
 
     }
 }
 
 const getUserMovies = (req, res, next) => {
-    const email = req.email.email;
-    const movies = User.getUserMovies(email)
-    
-    res.status(200).send({movies})
+    try {
+        const email = req.email.email;
+        const movies = User.getUserMovies(email)
+        res.status(200).json({movies})
+    }
+    catch (e) {
+        res.status(400).json({message: e.message})
+    }
 }
 
 export default {deleteUser, getUserMovies}

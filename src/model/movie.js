@@ -32,7 +32,7 @@ class Movie {
             const movies = Movie.loadMovies(); 
             let movieExists = movies.find((movie) => movie.title === title)
             if (!movieExists) throw new Error("Movie doesn't exist!");
-            return movieExists
+            else return movieExists
         }
 
         catch (e) {
@@ -42,6 +42,7 @@ class Movie {
 
     static getRating(title) {
         const movie = Movie.getMovie(title)
+        if (!movie) return false
         const sum = movie.ratings.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0)
         return sum / movie.ratings.length
     }

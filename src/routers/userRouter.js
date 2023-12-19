@@ -10,5 +10,4 @@ router.delete("/", userController.deleteUser)
 
 router.get("/rated", userController.getUserMovies)
 
-
 export default router;

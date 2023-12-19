@@ -4,19 +4,21 @@ import User from "../model/user.js";
 const getMovie = (req, res, next) => {
    try { 
         let {title} = req.params;
-        title = title.replace("_", " ");
+        title = title.replaceAll("_", " ");
         const movie = Movie.getMovie(title);
-        res.status(200).json({title: movie})
+        if (!movie) throw new Error("Movie not in database!")
+        res.status(200).json(movie)
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message: e.message})
     }
 }
 
 const getMovies = (req, res, next) => {
     try {
-        const {genre} = req.params;
+        let {genre} = req.params;
+        genre = genre.replaceAll("_", " ");
         if (genre) res.send({movies: Movie.getMovies(genre.toLowerCase())})
         else res.status(200).json({movies: Movie.getMovies()})
     }
@@ -35,31 +37,37 @@ const addMovie = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message:e.message})
 
     }
 }
 
 const getRating = (req, res, next) => {
    try { 
-        const {title} = req.params;
-        res.status(200).json({rating: Movie.getRating(title)})
+        let {title} = req.params;
+        title = title.replaceAll("_", " ");
+        const rating = Movie.getRating(title)
+        if (!rating) throw new Error("Movie doesn't exist in the database!")
+        else res.status(200).json({rating})
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message:e.message})
 
     }
 }
 
 const searchMovie = (req, res, next) => {
     try {
-        const {title} = req.params;
+        let {title} = req.params;
+        title = title.replaceAll("_", " ");
+        if (!title) throw new Error("Title cant be empty!")
         const movies = Movie.getMovies();
         const matches = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
         res.status(200).json({movies: matches})
     }
     catch (e) {
+        res.status(400).send({message:e.message})
         console.log(e)
     }
 }

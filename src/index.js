@@ -16,7 +16,6 @@ app.use(`/api/${process.env.API_VERSION}/auth/`, authRouter)
 app.use(`/api/${process.env.API_VERSION}/users/`, userRouter)
 app.use(`/api/${process.env.API_VERSION}/movies/`, movieRouter)
 
-
 app.use((req, res) => {
           res.json({
             error: {
@@ -27,7 +26,7 @@ app.use((req, res) => {
             },
              message: 'Invalid route!'
           });
-    });
+});
 
 app.listen(3000, ()=> {
     console.log("Server is listening on port 3000!")
