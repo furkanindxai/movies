@@ -78,17 +78,17 @@ class User {
     }
 
     constructor(email, password) {
-        if (!validator.isEmail(email)) throw Error("Invalid email!");
+        if (!validator.isEmail(email)) throw new Error("Invalid email!");
         
 
         const users = User.loadUsers(); 
         let userAlreadyExists = users.find((user) => user.email === email)
 
 
-        if (userAlreadyExists) throw Error("User is already registered!")
+        if (userAlreadyExists) throw new Error("User is already registered!")
 
         else {
-            if (!password) throw new Error("Password field can't be blank!");
+            if (!password || password.length < 4) throw new Error("Invalid password!");
             this.#email = email;
             this.#password = hashPassword(password);
             this.#rated = [];
