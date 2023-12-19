@@ -11,7 +11,8 @@ const signUp = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message:e.message})
+
     }
 }
 
@@ -31,7 +32,7 @@ const login = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(401)
+        res.status(401).json({message:e.message})
     }
 
 }
