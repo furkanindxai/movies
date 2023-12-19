@@ -18,8 +18,10 @@ const getMovie = (req, res, next) => {
 const getMovies = (req, res, next) => {
     try {
         let {genre} = req.params;
-        genre = genre.replaceAll("_", " ");
-        if (genre) res.send({movies: Movie.getMovies(genre.toLowerCase())})
+        if (genre) {
+            genre = genre.replaceAll("_", " ");
+            res.send({movies: Movie.getMovies(genre.toLowerCase())})
+        }
         else res.status(200).json({movies: Movie.getMovies()})
     }
     catch (e) {
@@ -76,11 +78,11 @@ const rateMovie = (req, res, next) => {
     try {
         const {title, rating} = req.body;
         const email = req.email.email;
-       
+        if (typeof rating !== "number") throw new Error("Rating has to be a number!");
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
        
         const movie = Movie.getMovie(title);
-        if (!movie) throw("Movie not in database!")
+        if (!movie) throw new Error("Movie not in database!")
         const user = User.getUser(email);
         if (user.rated.includes(title)) {
             user.rated = user.rated.filter(rated=>rated!=title)
@@ -116,7 +118,7 @@ const rateMovie = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).json({message: e.message})
 
     }
 }
