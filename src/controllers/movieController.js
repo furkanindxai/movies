@@ -35,7 +35,7 @@ const addMovie = (req, res, next) => {
    try { 
         const {title, genres} = req.body;
         if (!title) throw new Error("Title is required!")
-        if (!genres || typeof genres !== Array) throw new Error("Genres array is required and cant be empty!")
+        if (!genres || !Array.isArray(genres)) throw new Error("Genres array is required and cant be empty!")
         const movie =  new Movie(title, genres);
         res.sendStatus(201);
     }
