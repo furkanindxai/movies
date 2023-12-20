@@ -6,6 +6,7 @@ import bcrypt from "bcrypt"
 const signUp = (req, res, next) => {
     try {
         const {email, password} = req.body;
+        if (!email || !password) throw new Error("Email and password are required!")
         const user = new User(email, password);
         res.sendStatus(201);
     }
@@ -19,6 +20,7 @@ const signUp = (req, res, next) => {
 const login = (req, res, next) => {
     try {
         const {email, password} = req.body
+        if (!email || !password) throw new Error("Email and password are required!")
         const users = User.loadUsers(); 
         let userAlreadyExists = users.find((user) => user.email === email)
         const invalidCreds = !userAlreadyExists || !bcrypt.compareSync(password, userAlreadyExists.password)
