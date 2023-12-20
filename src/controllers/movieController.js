@@ -36,7 +36,7 @@ const addMovie = (req, res, next) => {
         const {title, genres} = req.body;
         if (!title) throw new Error("Title is required!")
         if (!Array.isArray(genres)) throw new Error("Genres array is required and cant be empty!")
-        const movie =  new Movie(title, genres);
+        const movie =  new Movie(String(title), genres);
         res.sendStatus(201);
     }
     catch (e) {
@@ -78,8 +78,9 @@ const searchMovie = (req, res, next) => {
 
 const rateMovie = (req, res, next) => {
     try {
-        const {title, rating} = req.body;
+        let {title, rating} = req.body;
         if (!title || !rating) throw new Error("Title and rating are required!")
+        title = String(title);
         const email = req.email.email;
         if (typeof rating !== "number") throw new Error("Rating has to be a number!");
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")

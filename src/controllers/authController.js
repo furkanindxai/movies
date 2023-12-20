@@ -1,13 +1,14 @@
+import bcrypt from "bcrypt"
+
 import generateAccessToken from "../helpers/generateAccessToken.js";
 import User from "../model/user.js";
 
-import bcrypt from "bcrypt"
 
 const signUp = (req, res, next) => {
     try {
         const {email, password} = req.body;
         if (!email || !password) throw new Error("Email and password are required!")
-        const user = new User(email, password);
+        const user = new User(String(email), String(password));
         res.sendStatus(201);
     }
     catch (e) {
