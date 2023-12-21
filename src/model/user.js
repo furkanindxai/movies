@@ -82,14 +82,14 @@ class User {
         
 
         const users = User.loadUsers(); 
-        let userAlreadyExists = users.find((user) => user.email === email)
+        let userAlreadyExists = users.find((user) => user.email === email.toLowerCase())
 
 
         if (userAlreadyExists) throw new Error("User is already registered!")
 
         else {
             if (!password || password.length < 4) throw new Error("Invalid password!");
-            this.#email = email;
+            this.#email = email.toLowerCase();
             this.#password = hashPassword(password);
             this.#rated = [];
             const newUser = { email: this.#email, password: this.#password, rated:this.#rated};
