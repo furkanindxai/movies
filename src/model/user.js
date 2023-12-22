@@ -38,9 +38,11 @@ class User {
 
             const newUsers = users.filter(user=> email !== user.email);
             User.saveUsers(newUsers);
+            return false
         }
         catch (e) {
             console.log(e)
+            return {error: e.message}
         }
         
     }

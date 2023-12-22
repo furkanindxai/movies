@@ -17,16 +17,22 @@ const getMovie = (req, res, next) => {
 
 const getMovies = (req, res, next) => {
     try {
-        let {genre} = req.params;
-        if (genre) {
-            genre = genre.replaceAll("_", " ");
-            res.send({movies: Movie.getMovies(genre.toLowerCase())})
+        let {genres} = req.params;
+        if (genres) {
+            genres = genres.replaceAll("_", " ");
+            genres = genres.split("&");
+            genres = genres.map(genre=>{
+                if (genre.includes(',')) throw new Error("Genre cant include ','!");
+                return genre.toLowerCase()
+            })
+            const movies = Movie.getMovies(genres)
+            res.send({movies})
         }
         else res.status(200).json({movies: Movie.getMovies()})
     }
     catch (e) {
         console.log(e)
-        res.sendStatus(400)
+        res.status(400).send(e.message)
 
     }
 }
@@ -36,7 +42,7 @@ const addMovie = (req, res, next) => {
         const {title, genres} = req.body;
         if (!title) throw new Error("Title is required!")
         if (!Array.isArray(genres)) throw new Error("Genres array is required and cant be empty!")
-        const movie =  new Movie(String(title), genres);
+        const movie =  new Movie(String(title.trim()), genres);
         res.sendStatus(201);
     }
     catch (e) {
@@ -63,9 +69,9 @@ const getRating = (req, res, next) => {
 
 const searchMovie = (req, res, next) => {
     try {
-        let {title} = req.params;
-        title = title.replaceAll("_", " ");
+        let {title} = req.query;
         if (!title) throw new Error("Title cant be empty!")
+        title = title.replaceAll("_", " ");
         const movies = Movie.getMovies();
         const matches = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
         res.status(200).json({movies: matches})
@@ -80,7 +86,7 @@ const rateMovie = (req, res, next) => {
     try {
         let {title, rating} = req.body;
         if (!title || !rating) throw new Error("Title and rating are required!")
-        title = String(title);
+        title = String(title).trim()
         const email = req.email.email;
         if (typeof rating !== "number") throw new Error("Rating has to be a number!");
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")

@@ -2,7 +2,8 @@ import User from "../model/user.js"
 
 const deleteUser = (req, res, next) => {
     try {
-        User.deleteUser(req.email.email)
+        const error = User.deleteUser(req.email.email)
+        if (error) throw new Error(error.error)
         res.sendStatus(204)
     }
     catch (e) {

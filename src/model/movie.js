@@ -47,14 +47,19 @@ class Movie {
         return sum / movie.ratings.length
     }
 
-    static getMovies(genre="all") {
+    static getMovies(genres="all") {
         const movies = Movie.loadMovies()
         
-        if (genre === "all") {
+        if (genres === "all") {
             return movies
         }
         else {
-            const filteredMovies = movies.filter(movie=>movie.genres.includes(genre))
+            const requestedGenres = genres.sort().join(',')
+            const filteredMovies = movies.filter(movie=>{
+                
+                const movieGenres = movie.genres.sort().join(',')
+                if (movieGenres === requestedGenres || movieGenres.includes(requestedGenres)) return movie
+            })
             return filteredMovies;
         }
 
@@ -66,7 +71,7 @@ class Movie {
         if (!title || genres.length < 1) throw new Error("Title/Genres cant be empty!")
         
         genres = genres.map(genre=>{
-            if (typeof genre !== "string") throw new Error("Genres can only be strings!")
+            if (typeof genre !== "string" || genre.includes(',') || genre.includes("&")) throw new Error("Genres can only be strings and cant include ',' and '&'!")
             else return genre.toLowerCase()
         
         })

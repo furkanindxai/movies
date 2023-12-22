@@ -8,7 +8,7 @@ const signUp = (req, res, next) => {
     try {
         const {email, password} = req.body;
         if (!email || !password) throw new Error("Email and password are required!")
-        const user = new User(String(email), String(password));
+        const user = new User(String(email.trim()), String(password));
         res.sendStatus(201);
     }
     catch (e) {
@@ -23,7 +23,7 @@ const login = (req, res, next) => {
         const {email, password} = req.body
         if (!email || !password) throw new Error("Email and password are required!")
         const users = User.loadUsers(); 
-        let userAlreadyExists = users.find((user) => user.email === email)
+        let userAlreadyExists = users.find((user) => user.email.trim() === email.toLowerCase())
         const invalidCreds = !userAlreadyExists || !bcrypt.compareSync(password, userAlreadyExists.password)
             
         if (invalidCreds) throw Error("Invalid credentials!")
