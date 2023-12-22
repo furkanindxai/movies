@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 
 import User from "./user.js"
+import arrayHasSameElements from '../helpers/arrayHasSameElements.js';
 
 class Movie {
     #title
@@ -54,11 +55,9 @@ class Movie {
             return movies
         }
         else {
-            const requestedGenres = genres.sort().join(',')
             const filteredMovies = movies.filter(movie=>{
                 
-                const movieGenres = movie.genres.sort().join(',')
-                if (movieGenres === requestedGenres || movieGenres.includes(requestedGenres)) return movie
+                if (arrayHasSameElements(genres, movie.genres)) return movie
             })
             return filteredMovies;
         }
