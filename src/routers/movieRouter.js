@@ -18,7 +18,7 @@ router.get("/rating/:title", movieController.getRating)
 
 router.get("/search", movieController.searchMovie)
 
-router.post("/rate", movieController.rateMovie)
+router.post("/rating", movieController.rateMovie)
 
 router.get("/:title", movieController.getMovie)
 
