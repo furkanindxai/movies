@@ -23,7 +23,7 @@ const login = (req, res, next) => {
         const {email, password} = req.body
         if (!email || !password) throw new Error("Email and password are required!")
         const users = User.loadUsers(); 
-        let userAlreadyExists = users.find((user) => user.email.trim() === email.toLowerCase())
+        let userAlreadyExists = users.find((user) => user.email === email.toLowerCase().trim())
         const invalidCreds = !userAlreadyExists || !bcrypt.compareSync(password, userAlreadyExists.password)
             
         if (invalidCreds) throw Error("Invalid credentials!")
