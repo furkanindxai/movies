@@ -12,13 +12,9 @@ router.post("/", movieController.addMovie)
 
 router.get("/", movieController.getMovies)
 
-router.get("/genres/:genres", movieController.getMovies)
+router.get("/ratings/:title", movieController.getRating)
 
-router.get("/rating/:title", movieController.getRating)
-
-router.get("/search", movieController.searchMovie)
-
-router.post("/rating", movieController.rateMovie)
+router.post("/ratings", movieController.rateMovie)
 
 router.get("/:title", movieController.getMovie)
 

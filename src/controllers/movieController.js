@@ -17,16 +17,29 @@ const getMovie = (req, res, next) => {
 
 const getMovies = (req, res, next) => {
     try {
-        let {genres} = req.params;
-        if (genres) {
-            genres = genres.replaceAll("_", " ");
-            genres = genres.split("&");
-            genres = genres.map(genre=>{
-                if (genre.includes(',')) throw new Error("Genre cant include ','!");
-                return genre.toLowerCase()
-            })
-            const movies = Movie.getMovies(genres)
-            res.send({movies})
+
+        let {genres, title} = req.query;
+        let movies = [];
+        
+        if (genres || title) {
+            if (genres) {
+                genres = genres.split(" ")
+                genres = genres.map(genre=>{
+                    if (genre.includes(',')) throw new Error("Genre cant include ','!");
+                    return genre.toLowerCase().replaceAll("_", " ")
+                })
+                movies = Movie.getMovies(genres)
+            }
+            if (genres && title) {
+                title = title.replaceAll("_", " ");
+                movies = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
+            }
+            else if (title) {
+                movies = Movie.getMovies();
+                movies = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
+
+            }
+            res.status(200).json({movies})
         }
         else res.status(200).json({movies: Movie.getMovies()})
     }
@@ -64,21 +77,6 @@ const getRating = (req, res, next) => {
         console.log(e)
         res.status(400).json({message:e.message})
 
-    }
-}
-
-const searchMovie = (req, res, next) => {
-    try {
-        let {title} = req.query;
-        if (!title) throw new Error("Title cant be empty!")
-        title = title.replaceAll("_", " ");
-        const movies = Movie.getMovies();
-        const matches = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
-        res.status(200).json({movies: matches})
-    }
-    catch (e) {
-        res.status(400).send({message:e.message})
-        console.log(e)
     }
 }
 
@@ -133,4 +131,4 @@ const rateMovie = (req, res, next) => {
     }
 }
 
-export default {getMovie, getMovies, rateMovie, addMovie, getRating, searchMovie}
+export default {getMovie, getMovies, rateMovie, addMovie, getRating}
