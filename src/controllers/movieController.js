@@ -23,9 +23,8 @@ const getMovies = (req, res, next) => {
         
         if (genres || title) {
             if (genres) {
-                genres = genres.split(" ")
+                genres = genres.split(",")
                 genres = genres.map(genre=>{
-                    if (genre.includes(',')) throw new Error("Genre cant include ','!");
                     return genre.toLowerCase().replaceAll("_", " ")
                 })
                 movies = Movie.getMovies(genres)
@@ -82,13 +81,14 @@ const getRating = (req, res, next) => {
 
 const rateMovie = (req, res, next) => {
     try {
-        let {title, rating} = req.body;
+        let {title} = req.params
+        let {rating} = req.body;
         if (!title || !rating) throw new Error("Title and rating are required!")
         title = String(title).trim()
         const email = req.email.email;
         if (typeof rating !== "number") throw new Error("Rating has to be a number!");
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
-       
+        title = title.replaceAll("_", " ")
         const movie = Movie.getMovie(title);
         if (!movie) throw new Error("Movie not in database!")
         const user = User.getUser(email);

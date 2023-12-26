@@ -10,4 +10,6 @@ router.delete("/me", userController.deleteUser)
 
 router.get("/me/rated", userController.getUserMovies)
 
+router.patch("/me/password", userController.updatePassword);
+
 export default router;
