@@ -2,6 +2,7 @@ import bcrypt from "bcrypt"
 
 import hashPassword from "../helpers/hashPassword.js"
 import User from "../model/user.js"
+import paginate from "../helpers/paginate.js"
 
 const deleteUser = (req, res, next) => {
     try {
@@ -122,10 +123,17 @@ const activateAccount = (req, res, next) => {
 
 const getUsers = (req, res, next) => {
     try {
-        const {active} = (req.query.active === "true") ? true : (req.query.active === "false") ? false: true
-
+        const active = (req.query.active === "true") ? true : (req.query.active === "false") ? false: true
+        let {offset, limit} = req.query
+        offset = Number(offset)
+        limit = Number(limit)
         if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of deleted users!")
         const users = User.loadUsers()
+        if (offset && !limit || limit && !offset) throw new Error("Please provide both offset and limit!")
+        else if (limit && offset) {
+            const paginatedUsers = paginate(users, "active", active, offset, limit)
+            return res.status(200).json({paginatedUsers})
+        }
         if (!active) {
             const inactiveUsers = users.filter(user=>!user.active)
             res.status(200).json({inactiveUsers})
