@@ -12,4 +12,10 @@ router.get("/me/rated", userController.getUserMovies)
 
 router.patch("/me/password", userController.updatePassword);
 
+router.delete("/:id", userController.deleteUserByAdmin)
+
+router.patch("/activate/:id", userController.activateAccount)
+
+router.get("/", userController.getUsers)
+
 export default router;

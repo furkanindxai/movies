@@ -28,8 +28,10 @@ const login = (req, res, next) => {
             
         if (invalidCreds) throw Error("Invalid credentials!")
         else {
-           
-            const token = generateAccessToken(email)
+            const roles = userAlreadyExists.roles;
+            const id = userAlreadyExists.id;
+            if (!userAlreadyExists.active) throw new Error("Please contact admin to reactivate your account!")
+            const token = generateAccessToken(email, roles, id)
             res.status(200).json({token})
         }
     }

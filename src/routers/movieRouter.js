@@ -12,11 +12,14 @@ router.post("/", movieController.addMovie)
 
 router.get("/", movieController.getMovies)
 
-router.get("/ratings/:title", movieController.getRating)
+router.get("/ratings/:id", movieController.getRating)
 
-router.post("/ratings/:title", movieController.rateMovie)
+router.post("/ratings/:id", movieController.rateMovie)
 
-router.get("/:title", movieController.getMovie)
+router.get("/:id", movieController.getMovie)
 
+router.delete("/:id", movieController.deleteMovie)
+
+router.patch("/show/:id", movieController.showMovie)
 
 export default router;
