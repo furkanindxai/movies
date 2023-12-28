@@ -11,7 +11,7 @@ class User {
     #roles = ["user"]
     #active = true;
     #id;
-
+    //retrieves all users in the form of an array of javascript objects
     static loadUsers() {
         try {
             const dataBuffer = fs.readFileSync('../data/Users.json');
@@ -21,7 +21,7 @@ class User {
             console.log(e)
         }
     }
-
+    //saves all users in the users argument, which is an array of javascript objects
     static saveUsers(users) {
         try {
             const dataJSON = JSON.stringify(users);
@@ -31,7 +31,7 @@ class User {
             console.log(e)
         }
     }
-
+    //deletes a user based on the id argument.
     static deleteUser(id) {
         try {
             const users = User.loadUsers();
@@ -55,7 +55,7 @@ class User {
         }
         
     }
-
+    //retrieves a user based on the id.
     static getUser(id) {
         try {
             const users = User.loadUsers(); 
@@ -68,7 +68,7 @@ class User {
             console.log(e);
         }
     }
-
+    //retrieves all the movies that have been rated by the user.
     static getUserMovies(id) {
         try {
             const movies = Movie.getMovies()
@@ -87,7 +87,7 @@ class User {
             console.log(e)
         }
     }
-
+    //retrives the total number of movies in the json db.
     static getCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
@@ -99,7 +99,7 @@ class User {
             console.log(e)
         }
     }
-
+    //increments the count.
     static incrementCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
@@ -113,7 +113,7 @@ class User {
             console.log(e)
         }
     }
-
+    //saves a user based on email and password
     constructor(email, password) {
         if (!validator.isEmail(email)) throw new Error("Invalid email!");
         

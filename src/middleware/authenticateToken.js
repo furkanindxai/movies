@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 import User from "../model/user.js";
 
+//function checks validity of a JWT token.
 async function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];

@@ -1,7 +1,8 @@
 import validDelete from "../helpers/validDelete.js";
+import paginate from "../helpers/paginate.js";
 import Movie from "../model/movie.js";
 import User from "../model/user.js";
-
+//retrieves a movie based on id only if the movie's show value is true
 const getMovie = (req, res, next) => {
    try { 
         let {id} = req.params;
@@ -15,11 +16,12 @@ const getMovie = (req, res, next) => {
         res.status(400).json({message: e.message})
     }
 }
-
+//retrives movies based on query params(title, genres), if no query params are provided retrieves all movies
 const getMovies = (req, res, next) => {
     try {
 
-        let {genres, title} = req.query;
+        let {genres, title, offset, limit} = req.query;
+        if (offset && !limit || limit && !offset) throw new Error("Limit and offset are both required!")
         let movies = [];
         
         if (genres || title) {
@@ -40,22 +42,24 @@ const getMovies = (req, res, next) => {
                 movies = movies.filter(movie=>movie.title.toLowerCase().includes(title.toLowerCase()))
 
             }
-            movies = movies.filter(movie=>movie.show)
-            movies = movies.map(movie=>{
-                delete movie.show
-                return movie
-            })
-            res.status(200).json({movies})
         }
         else {
             movies = Movie.getMovies()
-            movies = movies.filter(movie=>movie.show)
-            movies = movies.map(movie=>{
-                delete movie.show
-                return movie
-            })
-            res.status(200).json({movies})
+
         }
+        if (offset && limit) {
+            offset = Number(offset)
+            limit = Number(limit)
+            movies = paginate(movies,"show", true,offset, limit)
+        }
+        else {
+            movies = movies.filter(movie=>movie.show)
+        }
+        movies = movies.map(movie=>{
+            delete movie.show
+            return movie
+        })
+        res.status(200).json({movies})
     }
     catch (e) {
         console.log(e)
@@ -63,7 +67,7 @@ const getMovies = (req, res, next) => {
 
     }
 }
-
+//controller function for adding a movie to db
 const addMovie = (req, res, next) => {
    try {
         const id = req.id; 
@@ -79,7 +83,7 @@ const addMovie = (req, res, next) => {
 
     }
 }
-
+//controller function for retrieving the average rating of a movie
 const getRating = (req, res, next) => {
    try { 
         let {id} = req.params;
@@ -96,7 +100,7 @@ const getRating = (req, res, next) => {
 
     }
 }
-
+//controller function for rating a movie 
 const rateMovie = (req, res, next) => {
     try {
         let {id} = req.params
@@ -147,7 +151,7 @@ const rateMovie = (req, res, next) => {
 }
 
 
-
+//controller function for soft deleting a movie
 const deleteMovie = (req, res, next) => {
     try {
         const userId = req.id
@@ -167,7 +171,7 @@ const deleteMovie = (req, res, next) => {
         res.status(400).json({message:e.message})
     }
 }
-
+//controller function for showing a movie
 const showMovie =  (req, res, next) => {
     try {
         let {id} = req.params;

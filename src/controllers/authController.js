@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 import generateAccessToken from "../helpers/generateAccessToken.js";
 import User from "../model/user.js";
 
-
+//controller function for signing up 
 const signUp = (req, res, next) => {
     try {
         const {email, password} = req.body;
@@ -17,7 +17,7 @@ const signUp = (req, res, next) => {
 
     }
 }
-
+//controller function for logging in.
 const login = (req, res, next) => {
     try {
         const {email, password} = req.body

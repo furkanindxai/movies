@@ -4,6 +4,7 @@ import hashPassword from "../helpers/hashPassword.js"
 import User from "../model/user.js"
 import paginate from "../helpers/paginate.js"
 
+//controller function for soft deleting a user
 const deleteUser = (req, res, next) => {
     try {
         if (req.roles.includes("admin")) throw new Error("Can't delete as you are the admin. Please contact the developer!")
@@ -17,7 +18,7 @@ const deleteUser = (req, res, next) => {
 
     }
 }
-
+//controller function that allows user account deletion by admin
 const deleteUserByAdmin = (req, res, next) => {
     try {
         let {id} = req.params;
@@ -39,7 +40,7 @@ const deleteUserByAdmin = (req, res, next) => {
         res.status(403).json({message: e.message})
     }
 }
-
+//controller function that retrieves user rated movies
 const getUserMovies = (req, res, next) => {
     try {
         const id = req.id;
@@ -55,7 +56,7 @@ const getUserMovies = (req, res, next) => {
         res.status(400).json({message: e.message})
     }
 }
-
+//controller function for password updation.
 const updatePassword = (req, res, next) => {
     try {
         const id = req.id;
@@ -87,7 +88,7 @@ const updatePassword = (req, res, next) => {
         res.status(400).json({message: e.message})
     }
 }
-
+//controller function that allows reactivation of account by admin.
 const activateAccount = (req, res, next) => {
     try {
         let {id} = req.params;
@@ -120,7 +121,7 @@ const activateAccount = (req, res, next) => {
     }
 }
 
-
+//function for getting users based on query params, only for admin.
 const getUsers = (req, res, next) => {
     try {
         const active = (req.query.active === "true") ? true : (req.query.active === "false") ? false: true

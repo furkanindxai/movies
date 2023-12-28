@@ -1,8 +1,6 @@
 import * as fs from 'fs';
 
-import User from "./user.js"
 import arrayHasSameElements from '../helpers/arrayHasSameElements.js';
-import validDelete from '../helpers/validDelete.js';
 
 class Movie {
     #title
@@ -12,6 +10,7 @@ class Movie {
     #show = true
     #id
 
+    //returns all movies in the form of an array of javascript objects
     static loadMovies() {
         try {
             const dataBuffer = fs.readFileSync('../data/Movies.json');
@@ -22,6 +21,7 @@ class Movie {
         }
     }
 
+    //saves all movies in the movies argument, which is an array of javascript objects
     static saveMovies(movies) {
         try {
             const dataJSON = JSON.stringify(movies);
@@ -31,7 +31,7 @@ class Movie {
             console.log(e)
         }
     }
-
+    //retrieves a movie based on movie id
     static getMovie(id) {
         try {
             const movies = Movie.loadMovies(); 
@@ -44,7 +44,7 @@ class Movie {
             console.log(e);
         }
     }
-
+    //retrieves the average rating of a movie based on the movie id
     static getRating(id) {
         const movie = Movie.getMovie(id)
         
@@ -52,7 +52,7 @@ class Movie {
         const sum = movie.ratings.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0)
         return sum / movie.ratings.length
     }
-
+    //retrieves the movies of a particular genre, if no genre is provided, it retrieves all movies
     static getMovies(genres="all") {
         let movies = Movie.loadMovies()
         if (genres === "all") {
@@ -67,7 +67,7 @@ class Movie {
         }
 
     }
-
+    //soft deletes a movie based on a movie id
     static deleteMovie(id) {
         try {
             const movie = Movie.getMovie(id);
@@ -83,7 +83,7 @@ class Movie {
             console.log(e)
         }
     }
-
+    //returns the count of all the movies in the json db, which is also used for generating movie id
     static getCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
@@ -95,7 +95,7 @@ class Movie {
             console.log(e)
         }
     }
-
+    //increments the count value
     static incrementCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
@@ -109,7 +109,7 @@ class Movie {
             console.log(e)
         }
     }
-
+    //construtor takes the title, genres and poster and writes them to the json db
     constructor(title, genres, poster) {
         this.#title = title
         this.#genres = genres
