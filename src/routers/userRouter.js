@@ -14,7 +14,9 @@ router.patch("/me/password", userController.updatePassword);
 
 router.delete("/:id", userController.deleteUserByAdmin)
 
-router.patch("/activate/:id", userController.activateAccount)
+router.patch("/restore/:id", userController.restoreAccount)
+
+router.put("/me", userController.updatePassword)
 
 router.get("/", userController.getUsers)
 

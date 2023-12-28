@@ -44,10 +44,17 @@ const deleteUserByAdmin = (req, res, next) => {
 const getUserMovies = (req, res, next) => {
     try {
         const id = req.id;
+        let {limit, offset} = req.query;
+        if (limit && !offset || offset && !limit) throw new Error("Limit and offset are both required!")
         let movies = User.getUserMovies(id)
-        movies = movies.filter(movie=>movie.show)
+        if (limit && offset) {
+            limit = Number(limit)
+            offset = Number(offset)
+            movies = paginate(movies, "none", 0, offset, limit)
+        }
+        movies = movies.filter(movie=>!movie.deleted)
         movies = movies.map(movie=>{
-            delete movie.show
+            delete movie.deleted
             return movie
         })
         res.status(200).json({movies})
@@ -89,7 +96,7 @@ const updatePassword = (req, res, next) => {
     }
 }
 //controller function that allows reactivation of account by admin.
-const activateAccount = (req, res, next) => {
+const restoreAccount = (req, res, next) => {
     try {
         let {id} = req.params;
         id = Number(id)
@@ -98,7 +105,7 @@ const activateAccount = (req, res, next) => {
         else {
             const user = User.getUser(id)
             if (user) {
-                user.active = true;
+                user.deleted = false;
                 let users = User.loadUsers();
                 
                 users = users.map(userFromArray=>{
@@ -124,21 +131,25 @@ const activateAccount = (req, res, next) => {
 //function for getting users based on query params, only for admin.
 const getUsers = (req, res, next) => {
     try {
-        const active = (req.query.active === "true") ? true : (req.query.active === "false") ? false: true
+        if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of users!")
+        let users = User.loadUsers()
+        const deleted = (req.query.deleted === "true") ? true : (req.query.deleted === "false") ? false: undefined
+
+        if (deleted) users = users.filter(user=>user.deleted)
+        else if (deleted === undefined) users = users
+        else users = users.filter(user=>!user.deleted)
         let {offset, limit} = req.query
-        offset = Number(offset)
-        limit = Number(limit)
-        if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of deleted users!")
-        const users = User.loadUsers()
         if (offset && !limit || limit && !offset) throw new Error("Please provide both offset and limit!")
         else if (limit && offset) {
-            const paginatedUsers = paginate(users, "active", active, offset, limit)
-            return res.status(200).json({paginatedUsers})
+            offset = Number(offset)
+            limit = Number(limit)
+            users = paginate(users, "deleted", deleted, offset, limit)
         }
-        if (!active) {
-            const inactiveUsers = users.filter(user=>!user.active)
-            res.status(200).json({inactiveUsers})
-        }
+        users = users.map(user=>{
+            delete user.deleted
+            return user
+        })
+        res.status(200).json({users})
     }
     catch (e) {
         console.log(e)
@@ -146,4 +157,4 @@ const getUsers = (req, res, next) => {
     }
 }
 
-export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, activateAccount, getUsers}
+export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, restoreAccount, getUsers}

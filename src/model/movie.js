@@ -1,13 +1,17 @@
 import * as fs from 'fs';
 
 import arrayHasSameElements from '../helpers/arrayHasSameElements.js';
-
+import validStringArray from "../helpers/validStringArray.js"
 class Movie {
     #title
     #genres
-    #poster
+    #releaseYear
+    #description
+    #directors
+    #producers
     #ratings = []
-    #show = true
+    #poster
+    #deleted = false
     #id
 
     //returns all movies in the form of an array of javascript objects
@@ -71,7 +75,7 @@ class Movie {
     static deleteMovie(id) {
         try {
             const movie = Movie.getMovie(id);
-            movie.show = false;
+            movie.deleted = true;
             const movies = Movie.loadMovies();
             const newMovies = movies.map(loadedMovie=>{
                 if (loadedMovie.id === id) return movie
@@ -96,7 +100,7 @@ class Movie {
         }
     }
     //increments the count value
-    static incrementCount() {
+    static #incrementCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
             const dataJSON = dataBuffer.toString();
@@ -110,25 +114,31 @@ class Movie {
         }
     }
     //construtor takes the title, genres and poster and writes them to the json db
-    constructor(title, genres, poster) {
+    constructor(title, genres, releaseYear, description, directors, producers, poster) {
         this.#title = title
         this.#genres = genres
+        this.#releaseYear = releaseYear
+        this.#description = description
+        this.#directors = directors
+        this.#producers = producers
         this.#poster = poster
 
-
-        if (!title || genres.length < 1) throw new Error("Title/Genres cant be empty!")
+        if (!title || !validStringArray(genres) || !validStringArray(directors) || !validStringArray(producers)) throw new Error("Title/Genres/Directors/Producers/Release Year/Description cant be empty!")
         
         this.#genres = this.#genres.map(genre=>{
-            if (typeof genre !== "string" || genre.includes(',') || genre.includes("&")) throw new Error("Genres can only be strings and cant include ',' and '&'!")
+            if (genre.includes(',')) throw new Error("Genre cant include ','!")
             else return genre.toLowerCase()
         
         })
         
+        if (releaseYear < 1900 || releaseYear > 2030) throw new Error("Invalid year!")
+        
+
         const movies = Movie.loadMovies();
    
         this.#id = Movie.getCount() + 1;
-        Movie.incrementCount();
-        const newMovie = {id: this.#id,title: this.#title, genres: this.#genres, ratings: this.#ratings, poster: this.#poster, show: this.#show}
+        Movie.#incrementCount();
+        const newMovie = {id: this.#id,title: this.#title, genres: this.#genres, releaseYear:this.#releaseYear, description: this.#description, directors: this.#directors,producers: this.#producers,ratings: this.#ratings, poster: this.#poster, deleted: this.#deleted}
         movies.push(newMovie);
         Movie.saveMovies(movies)
         

@@ -20,6 +20,8 @@ router.get("/:id", movieController.getMovie)
 
 router.delete("/:id", movieController.deleteMovie)
 
-router.patch("/show/:id", movieController.showMovie)
+router.patch("/restore/:id", movieController.restoreMovie)
+
+router.put("/:id", movieController.updateDescription)
 
 export default router;

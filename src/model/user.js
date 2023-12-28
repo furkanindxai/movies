@@ -9,7 +9,7 @@ class User {
     #password;
     #rated = [];
     #roles = ["user"]
-    #active = true;
+    #deleted = false;
     #id;
     //retrieves all users in the form of an array of javascript objects
     static loadUsers() {
@@ -41,7 +41,7 @@ class User {
 
             const newUsers = users.map(user=>{
                 if (user.id === id) {
-                    user.active = false
+                    user.deleted = true
                     return user
                 }
                 return user
@@ -100,7 +100,7 @@ class User {
         }
     }
     //increments the count.
-    static incrementCount() {
+    static #incrementCount() {
         try {
             const dataBuffer = fs.readFileSync('../data/Info.json');
             const dataJSON = dataBuffer.toString();
@@ -130,8 +130,8 @@ class User {
             this.#email = email.toLowerCase();
             this.#password = hashPassword(password);
             this.#id = User.getCount() + 1;
-            User.incrementCount()
-            const newUser = { id:this.#id ,email: this.#email, password: this.#password, rated:this.#rated, active: this.#active, roles: this.#roles };
+            User.#incrementCount()
+            const newUser = { id:this.#id ,email: this.#email, password: this.#password, rated:this.#rated, deleted: this.#deleted, roles: this.#roles };
             users.push(newUser)
             User.saveUsers(users)
 
