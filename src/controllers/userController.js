@@ -37,7 +37,7 @@ const deleteUserByAdmin = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message: e.message})
+        res.status(404).json({message: e.message})
     }
 }
 //controller function that retrieves user rated movies
@@ -124,7 +124,7 @@ const restoreAccount = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message: e.message})
+        res.status(404).json({message: e.message})
     }
 }
 
@@ -170,7 +170,7 @@ const getUser = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message:e.message})
+        res.status(404).json({message:e.message})
     }
 }
 

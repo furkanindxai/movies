@@ -19,7 +19,7 @@ const getMovie = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message: e.message})
+        res.status(404).json({message: e.message})
     }
 }
 //retrives movies based on query params(title, genres, offset and limit), if no query params are provided retrieves all movies
@@ -118,7 +118,7 @@ const getRating = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message:e.message})
+        res.status(404).json({message:e.message})
 
     }
 }
@@ -190,7 +190,7 @@ const deleteMovie = (req, res, next) => {
 
     catch (e) {
         console.log(e)
-        res.status(400).json({message:e.message})
+        res.status(404).json({message:e.message})
     }
 }
 //controller function for restoring a movie
@@ -214,7 +214,7 @@ const restoreMovie =  (req, res, next) => {
 
     catch (e) {
         console.log(e)
-        res.status(400).json({messge: e.message})
+        res.status(404).json({messge: e.message})
     }
 }
 
@@ -242,7 +242,7 @@ const updateDescription = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message: e.message})
+        res.status(404).json({message: e.message})
     }
 }
 
