@@ -20,4 +20,6 @@ router.put("/me", userController.updatePassword)
 
 router.get("/", userController.getUsers)
 
+router.get("/:id", userController.getUser)
+
 export default router;

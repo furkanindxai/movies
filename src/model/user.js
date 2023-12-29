@@ -38,7 +38,7 @@ class User {
 
             let userExists = users.find((user) => user.id === id)
             if (!userExists) throw new Error("User doesn't exist!");
-
+            
             const newUsers = users.map(user=>{
                 if (user.id === id) {
                     user.deleted = true

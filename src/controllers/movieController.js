@@ -9,7 +9,11 @@ const getMovie = (req, res, next) => {
    try { 
         let {id} = req.params;
         const movie = Movie.getMovie(Number(id));
-        if (!movie || movie.deleted) throw new Error("Movie not in database!")
+        if (!movie) throw new Error("Movie not in db!")
+        if (req.roles.includes("admin")) {
+            return res.status(200).json(movie)
+        }
+        if (movie.deleted) throw new Error("Movie not in database!")
         delete movie.deleted
         res.status(200).json(movie)
     }
@@ -80,7 +84,7 @@ const getMovies = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(400).send(e.message)
+        res.status(400).json({message: e.message})
 
     }
 }
@@ -88,7 +92,8 @@ const getMovies = (req, res, next) => {
 const addMovie = (req, res, next) => {
    try {
         const id = req.id; 
-        const {title, genres, releaseYear, description, directors, producers} = req.body;
+        let {title, genres, releaseYear, description, directors, producers} = req.body;
+
         if (!title) throw new Error("Title is required!")
         if (!Array.isArray(genres)) throw new Error("Genres array is required and cant be empty!")
         const movie =  new Movie(String(title.trim()), genres, Number(releaseYear), String(description), directors, producers,id);
@@ -140,7 +145,7 @@ const rateMovie = (req, res, next) => {
         })
        
         if (indOfRating === -1) movie.ratings.push({id: userId, rating})
-        else movie.ratings[indOfRating] = {id: userId}
+        else movie.ratings[indOfRating] = {id: userId, rating}
         
         const movies = Movie.loadMovies();
         const newMovies = movies.map(movieFromArray=>{
@@ -192,10 +197,10 @@ const deleteMovie = (req, res, next) => {
 const restoreMovie =  (req, res, next) => {
     try {
         let {id} = req.params;
+        if (!req.roles.includes("admin")) return res.status(403).json({message: "Only admin can restore movies!"})
         id = Number(id)
-        if (!req.roles.includes("admin")) throw new Error("Only the admin can restore movies!");
         const movie = Movie.getMovie(id);
-        if (!movie) throw new Error("Movie doesnt exist!")
+        if (!movie) throw new Error("Movie not in db!")
         if (!movie.deleted) return res.sendStatus(204)
         movie.deleted = false;
         let movies = Movie.getMovies();
@@ -209,7 +214,7 @@ const restoreMovie =  (req, res, next) => {
 
     catch (e) {
         console.log(e)
-        res.status(403).json({message: e.message})
+        res.status(400).json({messge: e.message})
     }
 }
 
@@ -221,8 +226,10 @@ const updateDescription = (req, res, next) => {
         let {description} = req.body;
         if (!description) throw new Error("Description is required!")
         description = String(description)
+        description = description.trim()
         const movie = Movie.getMovie(id)
-        if (!(movie.poster === id)) return res.sendStatus(403)
+        if (!movie) throw new Error("Movie not in db!")
+        if (!(movie.poster === req.id)) return res.sendStatus(403)
         if (movie.deleted) throw new Error("Movie not in db!")
         movie.description = description
         let movies = Movie.getMovies()

@@ -125,14 +125,20 @@ class Movie {
 
         if (!title || !validStringArray(genres) || !validStringArray(directors) || !validStringArray(producers)) throw new Error("Title/Genres/Directors/Producers/Release Year/Description cant be empty!")
         
+
+
         this.#genres = this.#genres.map(genre=>{
             if (genre.includes(',')) throw new Error("Genre cant include ','!")
-            else return genre.toLowerCase()
+            else return genre.toLowerCase().trim()
         
         })
         
         if (releaseYear < 1900 || releaseYear > 2030) throw new Error("Invalid year!")
         
+        title = title.trim()
+        description = description.trim()
+        directors = directors.map(director=>director.trim())
+        producers = producers.map(producer=>producer.trim())
 
         const movies = Movie.loadMovies();
    

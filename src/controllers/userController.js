@@ -25,7 +25,7 @@ const deleteUserByAdmin = (req, res, next) => {
         id = Number(id);
         const isAdmin = req.roles.includes("admin")
         if (!isAdmin) {
-            throw new Error("Require admin privileges to delete!")
+            return res.status(403).json({message: "Require admin level privileges to delete!"})
         }
         else {
             if (id === req.id) throw new Error("Can't delete as you are the admin. Please contact the developer!")
@@ -37,7 +37,7 @@ const deleteUserByAdmin = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(403).json({message: e.message})
+        res.status(400).json({message: e.message})
     }
 }
 //controller function that retrieves user rated movies
@@ -101,7 +101,7 @@ const restoreAccount = (req, res, next) => {
         let {id} = req.params;
         id = Number(id)
         const roles = req.roles;
-        if (!roles.includes("admin")) throw new Error("Contact the admin to activate your account!");
+        if (!roles.includes("admin")) return res.status(403).json({message: "Contact the admin to activate your account!"});
         else {
             const user = User.getUser(id)
             if (user) {
@@ -116,7 +116,7 @@ const restoreAccount = (req, res, next) => {
                 res.sendStatus(204)
             }
             else {
-                throw new Error("User couldnt be find!")
+                throw new Error("User couldnt be found!")
             
             }
         }
@@ -124,7 +124,7 @@ const restoreAccount = (req, res, next) => {
     }
     catch (e) {
         console.log(e)
-        res.status(403).json({message: e.message})
+        res.status(400).json({message: e.message})
     }
 }
 
@@ -139,14 +139,14 @@ const getUsers = (req, res, next) => {
         else if (deleted === undefined) users = users
         else users = users.filter(user=>!user.deleted)
         let {offset, limit} = req.query
-        if (offset && !limit || limit && !offset) throw new Error("Please provide both offset and limit!")
+        if (offset && !limit || limit && !offset) return res.status(400).json({message: "Limit and offset are both required!"})
         else if (limit && offset) {
             offset = Number(offset)
             limit = Number(limit)
             users = paginate(users, "deleted", deleted, offset, limit)
         }
         users = users.map(user=>{
-            delete user.deleted
+            delete user.password
             return user
         })
         res.status(200).json({users})
@@ -157,4 +157,21 @@ const getUsers = (req, res, next) => {
     }
 }
 
-export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, restoreAccount, getUsers}
+//function for getting the details of a particular user
+const getUser = (req, res, next) => {
+    try {
+        if (!req.roles.includes("admin")) return res.sendStatus(403)
+        let {id} = req.params;
+        id = Number(id)
+        const user = User.getUser(id)
+        if (!user) throw new Error("User doesn't exist!")
+        delete user.password
+        res.status(200).json(user)
+    }
+    catch (e) {
+        console.log(e)
+        res.status(400).json({message:e.message})
+    }
+}
+
+export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, restoreAccount, getUsers, getUser}

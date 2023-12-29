@@ -16,11 +16,11 @@ router.get("/ratings/:id", movieController.getRating)
 
 router.post("/ratings/:id", movieController.rateMovie)
 
+router.patch("/restore/:id", movieController.restoreMovie)
+
 router.get("/:id", movieController.getMovie)
 
 router.delete("/:id", movieController.deleteMovie)
-
-router.patch("/restore/:id", movieController.restoreMovie)
 
 router.put("/:id", movieController.updateDescription)
 

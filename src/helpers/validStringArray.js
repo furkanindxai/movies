@@ -1,3 +1,4 @@
+//checks whether all elements in an array are strings
 export default function validStringArray(arr) {
     if (!Array.isArray(arr)) return false
     else {
