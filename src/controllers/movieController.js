@@ -37,7 +37,7 @@ const getMovies = (req, res, next) => {
             if (genres) {
                 genres = genres.split(",")
                 genres = genres.map(genre=>{
-                    return genre.toLowerCase().replaceAll("_", " ")
+                    return genre.toLowerCase().replaceAll("_", " ").trim()
                 })
                 movies = Movie.getMovies(genres)
                 
