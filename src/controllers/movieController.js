@@ -43,7 +43,7 @@ const getMovies = (req, res, next) => {
                 
             }
             if (genres && keyword) {
-                title = title.replaceAll("_", " ");
+                keyword = keyword.replaceAll("_", " ");
                 movies = movies.filter(movie=>movie.title.toLowerCase().includes(keyword.toLowerCase()) || inAnyStringOfArr(movie.directors, keyword) || inAnyStringOfArr(movie.producers, keyword))
             }
             else if (keyword) {
