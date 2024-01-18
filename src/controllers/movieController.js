@@ -1,10 +1,9 @@
 import { Op } from 'sequelize';
 
-import validDelete from "../helpers/validDelete.js";
-import {Movie} from "../models/index.js";
 import sequelize from "../db/index.js";
+import {Movie, Rating} from "../models/index.js";
+import validDelete from "../helpers/validDelete.js";
 import validStringArray from "../helpers/validStringArray.js";
-import {Rating} from "../models/index.js";
 //retrieves a movie based on id only if the movie's delete value is false
 const getMovie = async (req, res, next) => {
    try { 

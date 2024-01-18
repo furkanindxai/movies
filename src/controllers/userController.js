@@ -55,7 +55,7 @@ const deleteUserByAdmin = async (req, res, next) => {
         res.status(400).json({message: e.message})
     }
 }
-//controller function that retrieves user rated movies
+//controller function that retrieves user movies
 const getUserMovies = async (req, res, next) => {
     try {
         const id = req.id;
@@ -192,6 +192,7 @@ const getUser = async (req, res, next) => {
     }
 }
 
+//function for updating user email
 const updateUser = async (req, res, next) => {
     try {
         const id = req.id;
