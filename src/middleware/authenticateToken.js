@@ -2,8 +2,6 @@ import "dotenv/config";
 
 import jwt from "jsonwebtoken";
 
-import sequelize from "../db/index.js";
-
 import {User} from "../models/index.js";
 
 //function checks validity of a JWT token.

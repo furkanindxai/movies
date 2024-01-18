@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt"
+import validator from "validator";
 
-import generateAccessToken from "../helpers/generateAccessToken.js";
 import {User} from "../models/index.js";
+import generateAccessToken from "../helpers/generateAccessToken.js";
 import hashPassword from "../helpers/hashPassword.js";
 
-import validator from "validator";
 
 //controller function for signing up 
 const signUp = async (req, res, next) => {

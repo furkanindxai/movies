@@ -10,14 +10,14 @@ const getMovie = async (req, res, next) => {
    try { 
         let {id} = req.params;
         id = Number(id)
-        const movie = await Movie.findOne({ where: { id }, paranoid: false, attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] } });
+        const movie = await Movie.findOne({ where: { id }, paranoid: false});
 
         if (!movie) throw new Error("Movie not in db!")
         if (req.roles.includes("admin")) {
             return res.status(200).json(movie)
         }
-        if (movie.deletedAt) throw new Error("Movie not in database!")
-
+        if (movie.deletedAt) throw new Error("Movie not in db!")
+        delete movie.dataValues.deletedAt
         res.status(200).json(movie)
     }
     catch (e) {
@@ -52,7 +52,7 @@ const getMovies = async (req, res, next) => {
                     
                 },
                 offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
-                order: [sortBy?sortBy: 'title', order?order: 'ASC'],
+                order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
                 paranoid: false ,
                 attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] }  
             });
@@ -155,8 +155,7 @@ const getRating = async (req, res, next) => {
               movieId: id
             }
           });
-
-        if (!rating) throw new Error("Movie hasnt been rated yet!")
+        if (!rating[0].dataValues.avg_rating) throw new Error("Movie hasnt been rated yet!")
         else res.status(200).json({rating: rating[0].dataValues.avg_rating})
     }
     catch (e) {
@@ -236,7 +235,7 @@ const restoreMovie =  async (req, res, next) => {
             return res.sendStatus(204)
         }
         else {
-            throw new Error("Movie couldnt be found!")
+            throw new Error("Movie not in database!")
         
         }
     }
@@ -253,13 +252,12 @@ const updateDescription = async (req, res, next) => {
         id = Number(id)
         let {description} = req.body;
         if (!description) throw new Error("At least one field is required!")
-        description = String(description)
-        description = description.trim()
+        description = String(description).trim()
         const movie = await Movie.findOne({ where: { id } });
         if (!movie) throw new Error("Movie not in db!")
         if (!(movie.poster === req.id)) return res.sendStatus(403)
         movie.description = description
-        movie.save()
+        await movie.save()
         res.sendStatus(204)
     }
     catch (e) {

@@ -11,7 +11,7 @@ router.use(authenticateToken)
 
 router.delete("/me", userController.deleteUser)
 
-router.get("/me/rated", userController.getUserMovies)
+router.get("/me/movies", userController.getUserMovies)
 
 router.patch("/me/password", userController.updatePassword);
 
@@ -24,5 +24,6 @@ router.put("/me", userController.updateUser)
 router.get("/", userController.getUsers)
 
 router.get("/:id", userController.getUser)
+
 
 export default router;
