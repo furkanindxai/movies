@@ -2,7 +2,9 @@ import "dotenv/config";
 
 import jwt from "jsonwebtoken";
 
-import User from "../model/user.js";
+import sequelize from "../db/index.js";
+
+import {User} from "../models/index.js";
 
 //function checks validity of a JWT token.
 async function authenticateToken(req, res, next) {
@@ -11,12 +13,14 @@ async function authenticateToken(req, res, next) {
   if (token === null) {
     return res.sendStatus(401);
   } else {
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async(err, user) => {
         if (err) {
+          console.log(err)
           return res.sendStatus(401);
         } else {
-          const userFromDb = User.getUser(user.id)
-          if (userFromDb.deleted) return res.sendStatus(401)
+          
+          const userFromDb = await User.findOne({ where: { id: user.id } });
+          if (!userFromDb) return res.sendStatus(401)
           req.email = user.email;
           req.roles = user.roles;
           req.id = user.id;

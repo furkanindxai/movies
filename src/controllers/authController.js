@@ -1,14 +1,25 @@
 import bcrypt from "bcrypt"
 
 import generateAccessToken from "../helpers/generateAccessToken.js";
-import User from "../model/user.js";
+import {User} from "../models/index.js";
+import hashPassword from "../helpers/hashPassword.js";
+
+import validator from "validator";
 
 //controller function for signing up 
-const signUp = (req, res, next) => {
+const signUp = async (req, res, next) => {
     try {
-        const {email, password} = req.body;
+        let {email, password} = req.body;
         if (!email || !password) throw new Error("Email and password are required!")
-        const user = new User(String(email.trim()), String(password));
+        email = email.trim().toLowerCase()
+        if (password.length < 4) throw new Error("Password length should be at least 4!")
+        if (!validator.isEmail(email)) throw new Error("Invalid email!")
+        const hashedPassword = hashPassword(String(password))
+        const user = await User.create({email, password: hashedPassword}).catch(
+            (error) => {
+                throw new Error("Sign up failed!")
+            }
+        );
         res.sendStatus(201);
     }
     catch (e) {
@@ -18,19 +29,20 @@ const signUp = (req, res, next) => {
     }
 }
 //controller function for logging in.
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
     try {
-        const {email, password} = req.body
+        let {email, password} = req.body
         if (!email || !password) throw new Error("Email and password are required!")
-        const users = User.loadUsers(); 
-        let userAlreadyExists = users.find((user) => user.email === email.toLowerCase().trim())
-        const invalidCreds = !userAlreadyExists || !bcrypt.compareSync(password, userAlreadyExists.password)
+        email = email.trim().toLowerCase()
+        if (!validator.isEmail(email)) throw new Error("Invalid email!")
+        const user = await User.findOne({ where: { email } });
+
+        const invalidCreds = !user || !bcrypt.compareSync(password, user.password)
             
         if (invalidCreds) throw Error("Invalid credentials!")
         else {
-            const roles = userAlreadyExists.roles;
-            const id = userAlreadyExists.id;
-            if (userAlreadyExists.deleted) throw new Error("Please contact admin to reactivate your account!")
+            const roles = user.roles;
+            const id = user.id;
             const token = generateAccessToken(email, roles, id)
             res.status(200).json({token})
         }

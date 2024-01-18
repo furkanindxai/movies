@@ -1,25 +1,32 @@
 import bcrypt from "bcrypt"
 
 import hashPassword from "../helpers/hashPassword.js"
-import User from "../model/user.js"
-import paginate from "../helpers/paginate.js"
+import {Movie, User} from "../models/index.js"
+import {Rating} from "../models/index.js"
+import validator from "validator"
 
 //controller function for soft deleting a user
-const deleteUser = (req, res, next) => {
+const deleteUser = async (req, res, next) => {
     try {
-        if (req.roles.includes("admin")) throw new Error("Can't delete as you are the admin. Please contact the developer!")
-        const error = User.deleteUser(req.id)
-        if (error) throw new Error(error.error)
+      
+        if (req.roles.includes("admin")) return res.status(403).json("Cant delete as you are the admin. Contact the dev!")
+        const user = await User.findOne({ where: { id }, paranoid: false });
+        if (!user) return res.status(404).json({message: "User not found!"})
+        await User.destroy({
+            where: {
+              id: req.id
+            }
+          });
         res.sendStatus(204)
     }
     catch (e) {
         console.log(e)
-        res.status(400).json({message: e.message})
+        res.status(500).json({message: e.message})
 
     }
 }
 //controller function that allows user account deletion by admin
-const deleteUserByAdmin = (req, res, next) => {
+const deleteUserByAdmin = async (req, res, next) => {
     try {
         let {id} = req.params;
         id = Number(id);
@@ -28,9 +35,17 @@ const deleteUserByAdmin = (req, res, next) => {
             return res.status(403).json({message: "Require admin level privileges to delete!"})
         }
         else {
-            if (id === req.id) throw new Error("Can't delete as you are the admin. Please contact the developer!")
-            const error = User.deleteUser(id)
-            if (error) throw new Error(error.error)
+            if (id === req.id) {
+                return res.status(403).json("Cant delete as you are the admin. Contact the dev!")
+            }
+            const user = await User.findOne({ where: { id }, paranoid: false });
+            if (!user) return res.status(404).json({message: "User not found!"})
+         
+            await User.destroy({
+                where: {
+                  id
+                }
+              });
             res.sendStatus(204)
 
         }
@@ -41,22 +56,28 @@ const deleteUserByAdmin = (req, res, next) => {
     }
 }
 //controller function that retrieves user rated movies
-const getUserMovies = (req, res, next) => {
+const getUserMovies = async (req, res, next) => {
     try {
         const id = req.id;
         let {limit, offset} = req.query;
-        if (limit && !offset || offset && !limit) throw new Error("Limit and offset are both required!")
-        let movies = User.getUserMovies(id)
-        if (limit && offset) {
-            limit = Number(limit)
-            offset = Number(offset)
-            movies = paginate(movies, "none", 0, offset, limit)
-        }
-        movies = movies.filter(movie=>!movie.deleted)
-        movies = movies.map(movie=>{
-            delete movie.deleted
-            return movie
-        })
+        limit = Number(limit)
+        offset = Number(offset)
+        let movies = await Rating.findAll({
+            where: {
+                userId: id
+            },
+            attributes: { exclude: ['createdAt', 'deletedAt', 'updatedAt', 'movieId'] },
+            include: [{
+                model: Movie,
+                attributes: {
+                    exclude: ['createdAt', 'deletedAt', 'updatedAt'] 
+                },
+    
+            }],
+            offset: offset ? offset : 0,limit : limit ? limit : 3232424223,     
+        });
+ 
+        
         res.status(200).json({movies})
     }
     catch (e) {
@@ -64,15 +85,14 @@ const getUserMovies = (req, res, next) => {
     }
 }
 //controller function for password updation.
-const updatePassword = (req, res, next) => {
+const updatePassword = async (req, res, next) => {
     try {
         const id = req.id;
         const {password, confirmPassword, newPassword} = req.body;
         if (!password || !confirmPassword || !newPassword) throw new Error("All fields are required!")
         else if (newPassword !== confirmPassword) throw new Error("Passwords dont match!");
         else {
-            const users = User.loadUsers(); 
-            let user = users.find((user) => user.id === id)
+            const user = await User.findOne({ where: { id }});
             if (!user) throw new Error("User doesnt exist!");
             else {
                 if (!bcrypt.compareSync(password, user.password)) throw new Error("Incorrect password!")
@@ -80,11 +100,7 @@ const updatePassword = (req, res, next) => {
                     if (newPassword.lenght < 4) throw new Error("Password length has to be at least 4!")
                     const hashedPw = hashPassword(newPassword)
                     user.password = hashedPw;
-                    const newUsers = users.map(userFromArray=> {
-                        if (userFromArray.id === id) return user
-                        return userFromArray
-                    })
-                    User.saveUsers(newUsers)
+                    await user.save()
                     res.sendStatus(204);
                 }
             }
@@ -96,23 +112,16 @@ const updatePassword = (req, res, next) => {
     }
 }
 //controller function that allows reactivation of account by admin.
-const restoreAccount = (req, res, next) => {
+const restoreAccount = async (req, res, next) => {
     try {
         let {id} = req.params;
         id = Number(id)
         const roles = req.roles;
-        if (!roles.includes("admin")) return res.status(403).json({message: "Contact the admin to activate your account!"});
+        if (!roles.includes("admin")) return res.status(403).json({message: "You dont have admin level privileges!"});
         else {
-            const user = User.getUser(id)
+            const user = await User.findOne({ where: { id }, paranoid: false });
             if (user) {
-                user.deleted = false;
-                let users = User.loadUsers();
-                
-                users = users.map(userFromArray=>{
-                    if (userFromArray.id === id) return user
-                    return userFromArray
-                })
-                User.saveUsers(users);
+                await user.restore()
                 res.sendStatus(204)
             }
             else {
@@ -120,7 +129,6 @@ const restoreAccount = (req, res, next) => {
             
             }
         }
-
     }
     catch (e) {
         console.log(e)
@@ -129,26 +137,18 @@ const restoreAccount = (req, res, next) => {
 }
 
 //function for getting users based on query params, only for admin.
-const getUsers = (req, res, next) => {
+const getUsers = async (req, res, next) => {
     try {
         if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of users!")
-        let users = User.loadUsers()
+        let {offset, limit} = req.query
+        offset = Number(offset)
+        limit = Number(limit)
+        let users = await User.findAll({ attributes: { exclude: ['password']}, paranoid:false, limit: limit ? limit : 78787878, offset: offset ? offset : 0})
         const deleted = (req.query.deleted === "true") ? true : (req.query.deleted === "false") ? false: undefined
-
-        if (deleted) users = users.filter(user=>user.deleted)
+        if (deleted) users = users.filter(user=>user.deletedAt)
         else if (deleted === undefined) users = users
         else users = users.filter(user=>!user.deleted)
-        let {offset, limit} = req.query
-        if (offset && !limit || limit && !offset) return res.status(400).json({message: "Limit and offset are both required!"})
-        else if (limit && offset) {
-            offset = Number(offset)
-            limit = Number(limit)
-            users = paginate(users, "deleted", deleted, offset, limit)
-        }
-        users = users.map(user=>{
-            delete user.password
-            return user
-        })
+
         res.status(200).json({users})
     }
     catch (e) {
@@ -158,14 +158,14 @@ const getUsers = (req, res, next) => {
 }
 
 //function for getting the details of a particular user
-const getUser = (req, res, next) => {
+const getUser = async (req, res, next) => {
     try {
         if (!req.roles.includes("admin")) return res.sendStatus(403)
         let {id} = req.params;
         id = Number(id)
-        const user = User.getUser(id)
-        if (!user) throw new Error("User doesn't exist!")
-        delete user.password
+        const user = await User.findOne({ where: { id }, paranoid: false, attributes: { exclude: ['password'] }});
+        if (!user) throw new Error("User not found!")
+        
         res.status(200).json(user)
     }
     catch (e) {
@@ -174,4 +174,26 @@ const getUser = (req, res, next) => {
     }
 }
 
-export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, restoreAccount, getUsers, getUser}
+const updateUser = async (req, res, next) => {
+    try {
+        const id = req.id;
+        let {email} = req.body;
+        if (!email) throw new Error("Require one field!")
+        email = email.trim().toLowerCase()
+        if (!validator.isEmail(email)) throw new Error("Invalid email!")
+        const exists = await User.findOne({ where: { email }});
+        if (exists) throw new Error("Account with the given email already exists!")
+        const user = await User.findOne({ where: { id }});
+        user.email = email;
+        user.save()
+        res.status(204).json({message:"User updated!"})
+
+    }
+
+    catch (e) {
+        console.log(e)
+        res.status(400).json({message: e.message})
+    }
+}
+
+export default {deleteUser, getUserMovies, updatePassword, deleteUserByAdmin, restoreAccount, getUsers, getUser, updateUser}
