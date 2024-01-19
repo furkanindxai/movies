@@ -33,84 +33,79 @@ const getMovies = async (req, res, next) => {
 
         let movies = [];
         
-        if (genres && keyword) {
-            genres = genres.split(",")
-            genres = genres.map(genre=>{
-                return genre.toLowerCase().replaceAll("_", " ").trim()
-            })
-            keyword = keyword.replaceAll("_", " ");
-               
-            movies = await Movie.findAll({
-                where: {
-                    genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
-                    [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`title ILIKE '%${keyword}%'`)
-                        
-                    ],
-                    
-                },
-                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
+        const queryFilters = {  
+            offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
                 order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
                 paranoid: false ,
-                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] }  
-            });
-            }
-        else if (genres) {
-            genres = genres.split(",")
-            genres = genres.map(genre=>{
-                return genre.toLowerCase().replaceAll("_", " ").trim()
-            })
-            movies = await Movie.findAll({
-                where: {
-                    genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
-
-                },
-                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
-                order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
-                paranoid: false,
-                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] }  
+                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] } 
+        }
 
 
-                });            
-        }   
-        else if (keyword) {
-            keyword = keyword.replaceAll("_", " ");
-            movies = await Movie.findAll({
-                where: {
-                    [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`title ILIKE '%${keyword}%'`)
+            if (genres && keyword) {
+                genres = genres.split(",")
+                genres = genres.map(genre=>{
+                    return genre.toLowerCase().replaceAll("_", " ").trim()
+                })
+                keyword = keyword.replaceAll("_", " ");
+                
+                movies = await Movie.findAll({
+                    where: {
+                        genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
+                        [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
+                                sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
+                                sequelize.literal(`title ILIKE '%${keyword}%'`)
+                            
+                        ],
                         
-                        ]
-                    
-                },
-                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
-                order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
-                paranoid: false,
-                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] }  
+                    },
+                ...queryFilters
+                });
+                }
+            else if (genres) {
+                genres = genres.split(",")
+                genres = genres.map(genre=>{
+                    return genre.toLowerCase().replaceAll("_", " ").trim()
+                })
+                movies = await Movie.findAll({
+                    where: {
+                        genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
 
-        });
-        
-        }
-        else {
-            movies = await Movie.findAll({
-                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,  
-                order: [[sortBy?sortBy: 'title', order?order: 'ASC']], paranoid: false,
-                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] }  
-            })
+                    },
+                ...queryFilters 
+                });            
+            }   
+            else if (keyword) {
+                keyword = keyword.replaceAll("_", " ");
+                movies = await Movie.findAll({
+                    where: {
+                        [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
+                                sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
+                                sequelize.literal(`title ILIKE '%${keyword}%'`)
+                            
+                            ]
+                        
+                    },
+                    ...queryFilters
+
+                });
             
-        }
-        if (!req.roles.includes('admin')){ 
-            movies = movies.filter(movie=>movie.deletedAt === null)
-        }
+            }
+            else {
+                movies = await Movie.findAll({
+                   ...queryFilters
+                })
+                
+            }
+            if (!req.roles.includes('admin')){ 
+                movies = movies.filter(movie=>movie.deletedAt === null)
+            }
 
-        else {
-            if (deleted === 'true') movies = movies.filter(movie=>movie.deletedAt !== null)
-            else if (deleted === 'false') movies.filter(movie=>movie.deletedAt === null)
-        }
-        
-        res.status(200).json({movies})
+            else {
+                if (deleted === 'true') movies = movies.filter(movie=>movie.deletedAt !== null)
+                else if (deleted === 'false') movies.filter(movie=>movie.deletedAt === null)
+            }
+            
+            res.status(200).json({movies})
     }
     catch (e) {
         console.log(e)
