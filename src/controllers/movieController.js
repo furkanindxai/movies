@@ -37,7 +37,6 @@ const getMovies = async (req, res, next) => {
             offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
                 order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
                 paranoid: false ,
-                attributes: { exclude: [req.roles.includes('admin') ? '' : 'deletedAt'] } 
         }
 
 
@@ -98,6 +97,10 @@ const getMovies = async (req, res, next) => {
         }
         if (!req.roles.includes('admin')){ 
             movies = movies.filter(movie=>movie.deletedAt === null)
+            movies = movies.map(movie=>{
+                delete movie.dataValues.deletedAt
+                return movie
+            })
         }
 
         else {
