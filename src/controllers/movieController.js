@@ -192,6 +192,8 @@ const rateMovie = async (req, res, next) => {
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
         const movie = await Movie.findOne({ where: { id } });
         if (!movie) throw new Error("Movie not in database!")
+        const existingRating = await Rating.findOne({where: { userId, movieId:id }, paranoid: false})
+        if (existingRating && existingRating.deletedAt) return res.status(403).json({message: "Rating was deleted!"})
         const [oldRating, created] = await Rating.findOrCreate({
             where: { userId, movieId:id },
             defaults: {

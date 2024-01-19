@@ -6,7 +6,7 @@ import validDelete from "../helpers/validDelete.js";
 //deletes a rating
 const deleteRating = async (req, res, next) => {
     try {
-        let {id} = req.parmas;
+        let {id} = req.params;
         id = Number(id)
         const rating = await Rating.findOne({where: {id}})
         if (!rating) return res.sendStatus(404)
@@ -43,7 +43,7 @@ const restoreRating = async (req, res, next) => {
     try {
         if (!req.roles.includes("admin")) return res.sendStatus(403)
         
-        let {id} = req.parmas;
+        let {id} = req.params;
         id = Number(id)
 
         const movie = await Movie.findOne({ where: { id } });
@@ -63,6 +63,7 @@ const restoreRating = async (req, res, next) => {
         });
         movie.averageRating = averageRating[0].dataValues.avg_rating
         await movie.save()
+        res.sendStatus(204)
     }
     catch (e) {
         console.log(e)
