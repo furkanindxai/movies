@@ -1,7 +1,6 @@
 import express from "express";
 
 import movieController from "../controllers/movieController.js";
-
 import authenticateToken from "../middleware/authenticateToken.js";
 import testDbConnection from "../middleware/testDbConnection.js";
 

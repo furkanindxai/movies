@@ -8,6 +8,7 @@ import userRouter from "./routers/userRouter.js"
 import movieRouter from "./routers/movieRouter.js"
 
 const app = express()
+const PORT = process.env.PORT || 3001;
 
 app.use(cors())
 app.use(express.json())
@@ -28,6 +29,6 @@ app.use((req, res) => {
           });
 });
 
-app.listen(3000, ()=> {
-    console.log("Server is listening on port 3000!")
+app.listen(PORT, ()=> {
+    console.log(`Server is listening on port ${PORT}!`)
 })

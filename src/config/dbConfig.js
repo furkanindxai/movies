@@ -1,8 +1,10 @@
+import "dotenv/config"
+
 export default {
     development: {
-      username: 'postgres',
-      password: 'password',
-      database: 'movies',
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       host: 'localhost',
       dialect: 'postgres',
     },
