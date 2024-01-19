@@ -41,71 +41,71 @@ const getMovies = async (req, res, next) => {
         }
 
 
-            if (genres && keyword) {
-                genres = genres.split(",")
-                genres = genres.map(genre=>{
-                    return genre.toLowerCase().replaceAll("_", " ").trim()
-                })
-                keyword = keyword.replaceAll("_", " ");
-                
-                movies = await Movie.findAll({
-                    where: {
-                        genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
-                        [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
-                                sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                                sequelize.literal(`title ILIKE '%${keyword}%'`)
-                            
-                        ],
+        if (genres && keyword) {
+            genres = genres.split(",")
+            genres = genres.map(genre=>{
+                return genre.toLowerCase().replaceAll("_", " ").trim()
+            })
+            keyword = keyword.replaceAll("_", " ");
+            
+            movies = await Movie.findAll({
+                where: {
+                    genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
+                    [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
+                            sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
+                            sequelize.literal(`title ILIKE '%${keyword}%'`)
                         
-                    },
+                    ],
+                    
+                },
+            ...queryFilters
+            });
+            }
+        else if (genres) {
+            genres = genres.split(",")
+            genres = genres.map(genre=>{
+                return genre.toLowerCase().replaceAll("_", " ").trim()
+            })
+            movies = await Movie.findAll({
+                where: {
+                    genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
+
+                },
+            ...queryFilters 
+            });            
+        }   
+        else if (keyword) {
+            keyword = keyword.replaceAll("_", " ");
+            movies = await Movie.findAll({
+                where: {
+                    [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
+                            sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
+                            sequelize.literal(`title ILIKE '%${keyword}%'`)
+                        
+                        ]
+                    
+                },
                 ...queryFilters
-                });
-                }
-            else if (genres) {
-                genres = genres.split(",")
-                genres = genres.map(genre=>{
-                    return genre.toLowerCase().replaceAll("_", " ").trim()
-                })
-                movies = await Movie.findAll({
-                    where: {
-                        genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
 
-                    },
-                ...queryFilters 
-                });            
-            }   
-            else if (keyword) {
-                keyword = keyword.replaceAll("_", " ");
-                movies = await Movie.findAll({
-                    where: {
-                        [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
-                                sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                                sequelize.literal(`title ILIKE '%${keyword}%'`)
-                            
-                            ]
-                        
-                    },
-                    ...queryFilters
-
-                });
+            });
+        
+        }
+        else {
+            movies = await Movie.findAll({
+                ...queryFilters
+            })
             
-            }
-            else {
-                movies = await Movie.findAll({
-                   ...queryFilters
-                })
-                
-            }
-            if (!req.roles.includes('admin')){ 
-                movies = movies.filter(movie=>movie.deletedAt === null)
-            }
+        }
+        if (!req.roles.includes('admin')){ 
+            movies = movies.filter(movie=>movie.deletedAt === null)
+        }
 
-            else {
-                if (deleted === 'true') movies = movies.filter(movie=>movie.deletedAt !== null)
-                else if (deleted === 'false') movies.filter(movie=>movie.deletedAt === null)
-            }
-            
-            res.status(200).json({movies})
+        else {
+            if (deleted === 'true') movies = movies.filter(movie=>movie.deletedAt !== null)
+            else if (deleted === 'false') movies = movies.filter(movie=>movie.deletedAt === null)
+        }
+        
+        res.status(200).json({movies})
     }
     catch (e) {
         console.log(e)
@@ -119,7 +119,8 @@ const addMovie = async (req, res, next) => {
         const id = req.id; 
         let {title, genres, releaseYear, description, directors, producers} = req.body;
         
-        if (!title || !releaseYear || !description || !validStringArray(genres) || !validStringArray(directors) || !validStringArray(producers)) throw new Error("Invalid data format!")
+        if (!title || !releaseYear || !description || !validStringArray(genres) || !validStringArray(directors) 
+        || !validStringArray(producers)) throw new Error("Invalid data format!")
         
         genres = genres.map(genre=>genre.trim().toLowerCase())
 
