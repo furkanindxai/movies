@@ -29,10 +29,13 @@ Rating.init({
         type: DataTypes.FLOAT,
         allowNull: false,
     
+    },
+    review: {
+        type: DataTypes.TEXT,
     }
 
 
-}, { sequelize,  modelName: 'Rating', });
+}, { sequelize,  modelName: 'Rating', paranoid: true});
 
 
 export default Rating;

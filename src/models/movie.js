@@ -41,6 +41,17 @@ Movie.init({
         type: DataTypes.ARRAY(DataTypes.STRING),
         allowNull:false
     },
+    averageRating: {
+        type: DataTypes.FLOAT,
+        defaultValue: 0.0
+
+    },
+    imageThumbnail: {
+        type: DataTypes.TEXT,
+    },
+    image: {
+        type: DataTypes.TEXT
+    }
 
 },{ sequelize,  modelName: 'Movie', paranoid: true });
 

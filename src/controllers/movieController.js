@@ -1,9 +1,10 @@
 import { Op } from 'sequelize';
 
 import sequelize from "../db/index.js";
-import {Movie, Rating} from "../models/index.js";
+import {Movie, Rating, User} from "../models/index.js";
 import validDelete from "../helpers/validDelete.js";
 import validStringArray from "../helpers/validStringArray.js";
+import validator from 'validator';
 //retrieves a movie based on id only if the movie's delete value is false
 const getMovie = async (req, res, next) => {
    try { 
@@ -138,23 +139,40 @@ const addMovie = async (req, res, next) => {
     }
 }
 //controller function for retrieving the average rating of a movie
-const getRating = async (req, res, next) => {
+const getMovieRatings = async (req, res, next) => {
    try { 
         let {id} = req.params;
         id = Number(id)
-        const movie = await Movie.findOne({ where: { id } });
-        if (!movie) throw new Error("Movie not found!")
+        const movie = await Movie.findOne({ where: { id }, paranoid: false });
+        if (!movie && !req.roles.includes('admin')) throw new Error("Movie not found!")
 
-        const rating = await Rating.findAll({
-            attributes: [
-                [sequelize.fn('AVG', sequelize.col('rating')), 'avg_rating'] 
-              ],
-            where: {
-              movieId: id
-            }
-          });
-        if (!rating[0].dataValues.avg_rating) throw new Error("Movie hasnt been rated yet!")
-        else res.status(200).json({rating: rating[0].dataValues.avg_rating})
+        let ratings = []
+        if (!req.roles.includes('admin')) {
+            ratings = await Rating.findAll({
+                where: {
+                    movieId: id
+                },
+                attributes: {
+                    exclude: ['deletedAt']
+                }
+            });
+        }
+        else {
+            ratings = await Rating.findAll({
+                where: {
+                    movieId: id
+                }, paranoid: false
+            });
+            ratings = await Promise.all(
+                ratings.map(async rating=>{
+                    const ratingPoster = rating.userId
+                    const isActiveUser = await User.findOne({where: {id: ratingPoster}})
+                    if (!isActiveUser) delete rating.dataValues.userId
+                    return rating
+            }))
+        }
+
+        res.status(200).json({ratings})
     }
     catch (e) {
         console.log(e)
@@ -167,8 +185,8 @@ const rateMovie = async (req, res, next) => {
     try {
         let {id} = req.params
         id = Number(id)
-        let {rating} = req.body;
-        if (!rating) throw new Error("Title and rating are required!")
+        let {rating, review} = req.body;
+        if (!rating) throw new Error("Rating is required!")
         const userId = req.id;
         if (typeof rating !== "number") throw new Error("Rating has to be a number!");
         if (rating < 1 || rating > 5) throw new Error("Rating has to be between 1 & 5!")
@@ -179,12 +197,24 @@ const rateMovie = async (req, res, next) => {
             defaults: {
               movieId: id,
               userId,
-              rating
+              rating,
+              review: review ? review : null
             }
           });
-          oldRating.rating = rating
-          oldRating.save()
+        oldRating.rating = rating
+        oldRating.review = review ? review : null
+        await oldRating.save()
 
+        const averageRating = await Rating.findAll({
+            attributes: [
+                [sequelize.fn('AVG', sequelize.col('rating')), 'avg_rating'] 
+                ],
+            where: {
+                movieId: id
+            }
+        });
+        movie.averageRating = averageRating[0].dataValues.avg_rating
+        await movie.save()
 
         res.sendStatus(201);
     }
@@ -264,5 +294,28 @@ const updateDescription = async (req, res, next) => {
     }
 }
 
+//controller function for adding movie poster
+const addMoviePoster = async (req, res, next) => {
+    try {
+        let {image, imageThumbnail} = req.body;
+        let {id} = req.params;
+        if (!image || !imageThumbnail) throw new Error("Need both image and thumbnail!")
+        id = Number(id)
+        image = String(image)
+        imageThumbnail = String(imageThumbnail)
+        if (!validator.isURL(image) || !validator.isURL(imageThumbnail)) throw new Error("Image and thumbnail need to be URLs!")
+        const movie = await Movie.findOne({where: {id}})
+        if (!movie) return res.status(404).json({message: "Movie not found!"})
+        movie.image = image
+        movie.imageThumbnail = imageThumbnail
+        await movie.save()
+        res.status(204).json({message: "Upload successful!"})
+    }
+    catch (e) {
+        console.log(e)
+        res.status(400).json({message:e.message})
+    }
 
-export default {getMovie, getMovies, rateMovie, addMovie, getRating, deleteMovie, restoreMovie, updateDescription}
+}
+
+export default {getMovie, getMovies, rateMovie, addMovie, getMovieRatings, deleteMovie, restoreMovie, updateDescription, addMoviePoster}
