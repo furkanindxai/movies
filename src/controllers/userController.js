@@ -94,7 +94,7 @@ const getUserMovies = async (req, res, next) => {
             throw new Error("Invalid option for type!")
         }
         
-        res.status(200).json({movies})
+        res.status(200).json(movies)
     }
     catch (e) {
         res.status(400).json({message: e.message})
@@ -168,7 +168,7 @@ const getUsers = async (req, res, next) => {
         else if (deleted === undefined) users = users
         else users = users.filter(user=>!user.deletedAt)
 
-        res.status(200).json({users})
+        res.status(200).json(users)
     }
     catch (e) {
         console.log(e)

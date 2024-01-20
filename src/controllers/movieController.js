@@ -111,7 +111,7 @@ const getMovies = async (req, res, next) => {
             else if (deleted === 'false') movies = movies.filter(movie=>movie.deletedAt === null)
         }
         
-        res.status(200).json({movies})
+        res.status(200).json(movies)
     }
     catch (e) {
         console.log(e)
@@ -174,7 +174,7 @@ const getMovieRatings = async (req, res, next) => {
             }))
         }
 
-        res.status(200).json({ratings})
+        res.status(200).json(ratings)
     }
     catch (e) {
         console.log(e)
