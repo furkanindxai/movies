@@ -5,7 +5,7 @@ import {Movie, Rating, User} from "../models/index.js";
 import validDelete from "../helpers/validDelete.js";
 import validStringArray from "../helpers/validStringArray.js";
 import validator from 'validator';
-//retrieves a movie based on id only if the movie's delete value is false
+//retrieves a movie based on id only if the movie's delete value is false if not admin
 const getMovie = async (req, res, next) => {
    try { 
         let {id} = req.params;
@@ -34,6 +34,8 @@ const getMovies = async (req, res, next) => {
 
         let movies = [];
         
+        if (sortBy && (sortBy !== 'title' && sortBy !== 'releaseYear') ||
+         (order && (order.toLowerCase() !== 'asc' && order.toLowerCase() !== 'desc'))) throw new Error('Invalid query params!')
         const queryFilters = {  
             offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
                 order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
