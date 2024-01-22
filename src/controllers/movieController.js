@@ -158,13 +158,6 @@ const getMovieRatings = async (req, res, next) => {
                     exclude: ['deletedAt']
                 }
             });
-        }
-        else {
-            ratings = await Rating.findAll({
-                where: {
-                    movieId: id
-                }, paranoid: false
-            });
             ratings = await Promise.all(
                 ratings.map(async rating=>{
                     const ratingPoster = rating.userId
@@ -172,6 +165,14 @@ const getMovieRatings = async (req, res, next) => {
                     if (!isActiveUser) delete rating.dataValues.userId
                     return rating
             }))
+        }
+        else {
+            ratings = await Rating.findAll({
+                where: {
+                    movieId: id
+                }, paranoid: false
+            });
+
         }
 
         res.status(200).json(ratings)
