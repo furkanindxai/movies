@@ -69,15 +69,17 @@ const getUserMovies = async (req, res, next) => {
                 where: {
                     userId: id
                 },
-                attributes: { exclude: ['createdAt', 'deletedAt', 'updatedAt', 'movieId'] },
+                attributes: { exclude: req.roles.includes('admin') ? ['movieId']: [ 'deletedAt', 'movieId'] },
                 include: [{
                     model: Movie,
                     attributes: {
-                        exclude: ['createdAt', 'deletedAt', 'updatedAt'] 
+                        exclude: req.roles.includes('admin') ? [''] : ['deletedAt'] 
                     },
+                    paranoid: !req.roles.includes('admin')
         
                 }],
-                offset: offset ? offset : 0,limit : limit ? limit : 3232424223,     
+                offset: offset ? offset : 0,limit : limit ? limit : 3232424223,
+                paranoid: !req.roles.includes('admin')     
             });
         }
         else if (type === 'posted') {
@@ -86,7 +88,10 @@ const getUserMovies = async (req, res, next) => {
                     poster: id
                     
                 },
-                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223
+                offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
+                attributes: { exclude: req.roles.includes('admin') ? ['']: [ 'deletedAt'] },
+                paranoid: !req.roles.includes('admin')
+
             });
 
         }
