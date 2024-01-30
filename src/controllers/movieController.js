@@ -311,6 +311,7 @@ const addMoviePoster = async (req, res, next) => {
         if (!validator.isURL(image) || !validator.isURL(imageThumbnail)) throw new Error("Image and thumbnail need to be URLs!")
         const movie = await Movie.findOne({where: {id}})
         if (!movie) return res.status(404).json({message: "Movie not found!"})
+        if (movie.poster !== req.id) return res.sendStatus(403)
         movie.image = image
         movie.imageThumbnail = imageThumbnail
         await movie.save()
