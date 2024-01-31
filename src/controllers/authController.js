@@ -20,7 +20,7 @@ const signUp = async (req, res, next) => {
                 throw new Error("Sign up failed!")
             }
         );
-        res.sendStatus(201);
+        res.status(201).json({message: "Sign up successful! Please sign in to continue."});
     }
     catch (e) {
         console.log(e)
