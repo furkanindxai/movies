@@ -123,15 +123,15 @@ const getMovies = async (req, res, next) => {
 const addMovie = async (req, res, next) => {
    try {
         const id = req.id; 
-        let {title, genres, releaseYear, description, directors, producers} = req.body;
+        let {title, genres, releaseYear, description, directors, producers, image, imageThumbnail} = req.body;
         
-        if (!title || !releaseYear || !description || !validStringArray(genres) || !validStringArray(directors) 
+        if (!title || !releaseYear || !description || !image || !imageThumbnail || !validStringArray(genres) || !validStringArray(directors) 
         || !validStringArray(producers)) throw new Error("Invalid data format!")
         
         genres = genres.map(genre=>genre.trim().toLowerCase())
 
-        const movie =  await Movie.create({title: String(title.trim()), genres, releaseYear: Number(releaseYear), description: String(description),
-         directors, producers, poster: id});
+        const movie =  await Movie.create({title: String(title).trim(), genres, releaseYear: Number(releaseYear), description: String(description),
+         directors, producers, image: String(image).trim(), imageThumbnail: String(imageThumbnail).trim(), poster: id});
         res.sendStatus(201);
     }
     catch (e) {

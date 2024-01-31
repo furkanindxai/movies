@@ -5,7 +5,7 @@ export default function validStringArray(arr) {
         if (arr.length === 0) return false
         else {
             for (let i = 0; i < arr.length; i++) {
-                if (typeof arr[i] !== "string") return false
+                if (typeof arr[i] !== "string" || arr[i].includes(',')) return false
             }
             return true
         }

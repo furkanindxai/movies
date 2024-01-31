@@ -20,7 +20,7 @@ const signUp = async (req, res, next) => {
                 throw new Error("Sign up failed!")
             }
         );
-        res.sendStatus(201);
+        res.status(201).json({message: "Sign up successful! Please sign in to continue."});
     }
     catch (e) {
         console.log(e)
@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
             const roles = user.roles;
             const id = user.id;
             const token = generateAccessToken(email, roles, id)
-            res.status(200).json({token})
+            res.status(200).json({token, id, email, roles})
         }
     }
     catch (e) {
