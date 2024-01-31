@@ -8,7 +8,7 @@ async function testDbConnection(req, res, next) {
     next()
   } catch (error) {
     console.error('Unable to connect to the database:', error);
-    return res.status(500).json({message: 'Db connection failed!'})
+    return res.status(500).json({message: 'Internal server error.'})
   }  
 }
 
