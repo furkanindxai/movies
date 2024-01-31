@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
             const roles = user.roles;
             const id = user.id;
             const token = generateAccessToken(email, roles, id)
-            res.status(200).json({token})
+            res.status(200).json({token, id, email, roles})
         }
     }
     catch (e) {
