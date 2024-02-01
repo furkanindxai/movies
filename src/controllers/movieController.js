@@ -132,7 +132,7 @@ const addMovie = async (req, res, next) => {
 
         const movie =  await Movie.create({title: String(title).trim(), genres, releaseYear: Number(releaseYear), description: String(description),
          directors, producers, image: String(image).trim(), imageThumbnail: String(imageThumbnail).trim(), poster: id});
-        res.sendStatus(201);
+        res.status(201).json({message: "Movie added successfully!"});
     }
     catch (e) {
         console.log(e)
