@@ -35,11 +35,12 @@ const getMovies = async (req, res, next) => {
         let movies = [];
         
         if (sortBy && (sortBy !== 'title' && sortBy !== 'releaseYear') ||
-         (order && (order.toLowerCase() !== 'asc' && order.toLowerCase() !== 'desc'))) throw new Error('Invalid query params!')
+         (order && (order.toLowerCase() !== 'asc' && order.toLowerCase() !== 'desc'))
+          || deleted && (deleted.toLowerCase() !== 'true' && deleted.toLowerCase() !== 'false')) throw new Error('Invalid query params!')
         const queryFilters = {  
             offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
                 order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
-                paranoid: false ,
+                paranoid: req.roles.includes("admin") ? false : true ,
         }
 
 
@@ -55,9 +56,12 @@ const getMovies = async (req, res, next) => {
                     genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
                     [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
                             sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`title ILIKE '%${keyword}%'`)
+                            sequelize.literal(`title ILIKE '%${keyword}%'`),
                         
                     ],
+                    deletedAt:
+                        deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+                    
                     
                 },
             ...queryFilters
@@ -71,6 +75,7 @@ const getMovies = async (req, res, next) => {
             movies = await Movie.findAll({
                 where: {
                     genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
+                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
 
                 },
             ...queryFilters 
@@ -82,9 +87,9 @@ const getMovies = async (req, res, next) => {
                 where: {
                     [Op.or]: [ sequelize.literal(`CAST ("directors" AS TEXT) ILIKE '%${keyword}%'`),
                             sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
-                            sequelize.literal(`title ILIKE '%${keyword}%'`)
-                        
-                        ]
+                            sequelize.literal(`title ILIKE '%${keyword}%'`),            
+                        ],
+                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
                     
                 },
                 ...queryFilters
@@ -94,6 +99,9 @@ const getMovies = async (req, res, next) => {
         }
         else {
             movies = await Movie.findAll({
+                where: 
+                    deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+,
                 ...queryFilters
             })
             
@@ -104,11 +112,6 @@ const getMovies = async (req, res, next) => {
                 delete movie.dataValues.deletedAt
                 return movie
             })
-        }
-
-        else {
-            if (deleted === 'true') movies = movies.filter(movie=>movie.deletedAt !== null)
-            else if (deleted === 'false') movies = movies.filter(movie=>movie.deletedAt === null)
         }
         
         res.status(200).json(movies)
