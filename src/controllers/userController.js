@@ -118,11 +118,11 @@ const updatePassword = async (req, res, next) => {
             else {
                 if (!bcrypt.compareSync(password, user.password)) throw new Error("Incorrect password!")
                 else {
-                    if (newPassword.lenght < 4) throw new Error("Password length has to be at least 4!")
+                    if (newPassword.length < 4) {throw new Error("Password length has to be at least 4!")}
                     const hashedPw = hashPassword(newPassword)
                     user.password = hashedPw;
                     await user.save()
-                    res.sendStatus(204);
+                    res.status(204).json({message: 'Password updated.'})
                 }
             }
         }

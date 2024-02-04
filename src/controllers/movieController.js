@@ -28,7 +28,6 @@ const getMovie = async (req, res, next) => {
 //retrives movies based on query params(title, genres, offset and limit), if no query params are provided retrieves all movies
 const getMovies = async (req, res, next) => {
     try {
-
         let {genres, keyword, offset, limit, deleted, sortBy, order} = req.query;
         if (deleted && !req.roles.includes("admin")) return res.sendStatus(403)
 
