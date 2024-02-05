@@ -13,4 +13,6 @@ router.delete("/:id", ratingController.deleteRating)
 
 router.patch("/restore/:id", ratingController.restoreRating)
 
+router.get("/", ratingController.getRatings)
+
 export default router;
