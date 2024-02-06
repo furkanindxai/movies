@@ -1,4 +1,6 @@
 import sequelize from "../db/index.js";
+import { Op } from 'sequelize';
+
 import {Movie, Rating} from "../models/index.js";
 import validDelete from "../helpers/validDelete.js";
 
@@ -75,7 +77,21 @@ const restoreRating = async (req, res, next) => {
 const getRatings = async (req, res, next) => {
     try {
         if (!req.roles.includes("admin")) return res.sendStatus(403)
-        const ratings = await Rating.findAll({paranoid: false,order: [['id', 'ASC']]})
+        if (req.query.deleted && (req.query.deleted !== 'true' && req.query.deleted !== 'false')) 
+            return res.status(400).json({message: "Invalid option for delete!"})
+        let {limit, offset, deleted} = req.query
+        offset = Number(offset)
+        limit = Number(limit)
+        const ratings = await Rating.findAll({
+            where: {
+                deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) 
+                : sequelize.literal(`"deletedAt" IS NULL`)) : 
+                {[Op.or]: [sequelize.literal(`"deletedAt" IS NOT NULL`), sequelize.literal(`"deletedAt" IS NULL`)]}
+             },
+             attributes: { exclude: ['password']}, 
+             paranoid:false, limit: limit ? limit : 78787878,
+             offset: offset ? offset : 0,  order: [['id', 'ASC']]
+        })
         res.status(200).json(ratings)
     }
     catch (e) {
