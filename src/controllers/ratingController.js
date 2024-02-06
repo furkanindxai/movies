@@ -71,5 +71,18 @@ const restoreRating = async (req, res, next) => {
     }
 }
 
+//retreives all ratings
+const getRatings = async (req, res, next) => {
+    try {
+        if (!req.roles.includes("admin")) return res.sendStatus(403)
+        const ratings = await Rating.findAll({paranoid: false,order: [['id', 'ASC']]})
+        res.status(200).json(ratings)
+    }
+    catch (e) {
+        console.log(e)
+        res.status(400).json({message:e.message})
+    }
+}
 
-export default {deleteRating, restoreRating}
+
+export default {deleteRating, restoreRating, getRatings}

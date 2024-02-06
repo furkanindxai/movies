@@ -11,7 +11,6 @@ const getMovie = async (req, res, next) => {
         let {id} = req.params;
         id = Number(id)
         const movie = await Movie.findOne({ where: { id }, paranoid: false});
-
         if (!movie) throw new Error("Movie not in db!")
         if (req.roles.includes("admin")) {
             return res.status(200).json(movie)
@@ -59,7 +58,8 @@ const getMovies = async (req, res, next) => {
                         
                     ],
                     deletedAt:
-                        deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+                        deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
+                            [sequelize.literal(`"deletedAt" IS NOT NULL`),sequelize.literal(`"deletedAt" IS NULL`)]}
                     
                     
                 },
@@ -74,7 +74,8 @@ const getMovies = async (req, res, next) => {
             movies = await Movie.findAll({
                 where: {
                     genres: { [Op.contains]: sequelize.cast(genres, 'VARCHAR(255)[]')},
-                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
+                        [sequelize.literal(`"deletedAt" IS NOT NULL`),sequelize.literal(`"deletedAt" IS NULL`)]}
 
                 },
             ...queryFilters 
@@ -88,7 +89,8 @@ const getMovies = async (req, res, next) => {
                             sequelize.literal(`CAST ("producers" AS TEXT) ILIKE '%${keyword}%'`),
                             sequelize.literal(`title ILIKE '%${keyword}%'`),            
                         ],
-                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+                    deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
+                         [sequelize.literal(`"deletedAt" IS NOT NULL`),sequelize.literal(`"deletedAt" IS NULL`)]}
                     
                 },
                 ...queryFilters
@@ -99,7 +101,8 @@ const getMovies = async (req, res, next) => {
         else {
             movies = await Movie.findAll({
                 where: 
-                    deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : null
+                    deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
+                        [sequelize.literal(`"deletedAt" IS NOT NULL`),sequelize.literal(`"deletedAt" IS NULL`)]}
 ,
                 ...queryFilters
             })

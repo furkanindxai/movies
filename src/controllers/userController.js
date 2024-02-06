@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt"
 import validator from "validator"
+import sequelize from "../db/index.js";
+import { Op } from 'sequelize';
 
 import {Movie, User, Rating} from "../models/index.js"
 import hashPassword from "../helpers/hashPassword.js"
@@ -161,18 +163,21 @@ const restoreAccount = async (req, res, next) => {
 const getUsers = async (req, res, next) => {
     try {
         if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of users!")
-        let {offset, limit} = req.query
-        offset = Number(offset)
-        limit = Number(limit)
-        let users = await User.findAll({ attributes: { exclude: ['password']}, 
-        paranoid:false, limit: limit ? limit : 78787878, offset: offset ? offset : 0,  order: [['id', 'ASC']]})
         if (req.query.deleted && (req.query.deleted !== 'true' && req.query.deleted !== 'false')) 
             return res.status(400).json({message: "Invalid option for delete!"})
-        const deleted = (req.query.deleted === "true") ? true : (req.query.deleted === "false") ? false: undefined
-        if (deleted) users = users.filter(user=>user.deletedAt)
-        else if (deleted === undefined) users = users
-        else users = users.filter(user=>!user.deletedAt)
-
+        let {offset, limit, deleted} = req.query
+        offset = Number(offset)
+        limit = Number(limit)
+        let users = await User.findAll({
+             where: {
+                deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) 
+                : sequelize.literal(`"deletedAt" IS NULL`)) : 
+                {[Op.or]: [sequelize.literal(`"deletedAt" IS NOT NULL`), sequelize.literal(`"deletedAt" IS NULL`)]}
+             },
+             attributes: { exclude: ['password']}, 
+             paranoid:false, limit: limit ? limit : 78787878,
+             offset: offset ? offset : 0,  order: [['id', 'ASC']]
+        })
         res.status(200).json(users)
     }
     catch (e) {
