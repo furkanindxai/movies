@@ -100,5 +100,21 @@ const getRatings = async (req, res, next) => {
     }
 }
 
+//get rating by id
+const getRatingById = async (req, res, next) => {
+    try {
+        if (!req.roles.includes("admin")) return res.sendStatus(403)
+        let {id} = req.params;
+        id = Number(id)
+        const rating = await Rating.findOne({ where: { id }, paranoid: false});
+        if (!rating) throw new Error("Rating not found!")
+        res.status(200).json(rating)
+    }
+    catch (e) {
+        console.log(e)
+        res.status(404).json({message:e.message})
+    }
+}
 
-export default {deleteRating, restoreRating, getRatings}
+
+export default {deleteRating, restoreRating, getRatings, getRatingById}
