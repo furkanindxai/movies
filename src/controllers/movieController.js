@@ -58,7 +58,8 @@ const getMovies = async (req, res, next) => {
                         
                     ],
                     deletedAt:
-                        deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
+                        deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) : 
+                            sequelize.literal(`"deletedAt" IS NULL`)) : {[Op.or]:
                             [sequelize.literal(`"deletedAt" IS NOT NULL`),sequelize.literal(`"deletedAt" IS NULL`)]}
                     
                     

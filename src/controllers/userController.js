@@ -165,11 +165,13 @@ const getUsers = async (req, res, next) => {
         if (!req.roles.includes("admin")) throw new Error("Only admin can see the list of users!")
         if (req.query.deleted && (req.query.deleted !== 'true' && req.query.deleted !== 'false')) 
             return res.status(400).json({message: "Invalid option for delete!"})
-        let {offset, limit, deleted} = req.query
+        let {offset, limit, deleted, keyword} = req.query
         offset = Number(offset)
         limit = Number(limit)
+        keyword ? keyword.toLowerCase().trim() : undefined
         let users = await User.findAll({
              where: {
+                email: {[Op.iLike]:keyword ? `%${keyword}%` : `%%`},
                 deletedAt: deleted ? (deleted === 'true' ? sequelize.literal(`"deletedAt" IS NOT NULL`) 
                 : sequelize.literal(`"deletedAt" IS NULL`)) : 
                 {[Op.or]: [sequelize.literal(`"deletedAt" IS NOT NULL`), sequelize.literal(`"deletedAt" IS NULL`)]}
