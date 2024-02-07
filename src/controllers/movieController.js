@@ -37,7 +37,7 @@ const getMovies = async (req, res, next) => {
           || deleted && (deleted.toLowerCase() !== 'true' && deleted.toLowerCase() !== 'false')) throw new Error('Invalid query params!')
         const queryFilters = {  
             offset: offset ? Number(offset) : 0,limit : limit ? Number(limit) : 3232424223,
-                order: [[sortBy?sortBy: 'title', order?order: 'ASC']],
+                order: [[sortBy?sortBy: 'id', order?order: 'ASC']],
                 paranoid: req.roles.includes("admin") ? false : true ,
         }
 
