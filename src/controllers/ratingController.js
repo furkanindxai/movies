@@ -12,7 +12,7 @@ const deleteRating = async (req, res, next) => {
         id = Number(id)
         const rating = await Rating.findOne({where: {id}})
         if (!rating) return res.sendStatus(404)
-        const movie = await Movie.findOne({ where: { id } });
+        const movie = await Movie.findOne({ where: { id: rating.movieId } });
         if (!movie) return res.sendStatus(404)
         const requester = req.id
         const roles = req.roles
@@ -48,11 +48,12 @@ const restoreRating = async (req, res, next) => {
         let {id} = req.params;
         id = Number(id)
 
-        const movie = await Movie.findOne({ where: { id } });
-        if (!movie) return res.status(404).json({message: 'Not found!'})
-
         const rating = await Rating.findOne({where: {id}, paranoid: false})
         if (!rating) return res.sendStatus(404)
+
+        const movie = await Movie.findOne({ where: { id: rating.movieId } });
+        if (!movie) return res.status(404).json({message: 'Not found!'})
+
 
         await rating.restore()
         const averageRating = await Rating.findAll({
@@ -60,7 +61,7 @@ const restoreRating = async (req, res, next) => {
                 [sequelize.fn('AVG', sequelize.col('rating')), 'avg_rating'] 
                 ],
             where: {
-                movieId: id
+                movieId: rating.movieId
             }
         });
         movie.averageRating = averageRating[0].dataValues.avg_rating
