@@ -124,7 +124,7 @@ const updatePassword = async (req, res, next) => {
                     const hashedPw = hashPassword(newPassword)
                     user.password = hashedPw;
                     await user.save()
-                    res.status(204).json({message: 'Password updated.'})
+                    res.sendStatus(204)
                 }
             }
         }
@@ -217,7 +217,7 @@ const updateUser = async (req, res, next) => {
         const user = await User.findOne({ where: { id }});
         user.email = email;
         await user.save()
-        res.status(204).json({message:"User updated!"})
+        res.sendStatus(204)
 
     }
 

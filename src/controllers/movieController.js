@@ -321,7 +321,7 @@ const addMoviePoster = async (req, res, next) => {
         movie.image = image
         movie.imageThumbnail = imageThumbnail
         await movie.save()
-        res.status(204).json({message: "Upload successful!"})
+        res.sendStatus(204)
     }
     catch (e) {
         console.log(e)
