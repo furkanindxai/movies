@@ -32,7 +32,7 @@ const deleteRating = async (req, res, next) => {
         });
         movie.averageRating = averageRating[0].dataValues.avg_rating
         await movie.save()
-        res.status(204).json({message:"Rating deleted!"})
+        res.sendStatus(204)
     }
     catch (e) {
         console.log(e)
