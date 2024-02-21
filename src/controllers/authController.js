@@ -17,6 +17,7 @@ const signUp = async (req, res, next) => {
         const hashedPassword = hashPassword(String(password))
         const user = await User.create({email, password: hashedPassword}).catch(
             (error) => {
+                console.log(error)
                 throw new Error("Sign up failed!")
             }
         );

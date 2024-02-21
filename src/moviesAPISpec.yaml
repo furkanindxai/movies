@@ -1,0 +1,1411 @@
+openapi: 3.0.2
+info:
+  title: Movies API V1
+  description: Movies API is a practice project that I built as part of my training at indx.ai.
+  version: '1'
+servers:
+  - url: http://127.0.0.1:3000/api/v1
+paths:
+  /auth/signin:
+    post:
+      tags:
+        - auth
+      summary: Signs in an user
+      description: Signs in a user based on their email id and password.
+      operationId: signin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+              additionalProperties: false
+        required: true
+
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  id:
+                    type: integer
+                    minimum: 1
+                  roles:
+                    type: string
+                  email:
+                    type: string
+        '401':
+          description: Failed operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Regsters a user
+      description: Regsters a user based on an email and a password.
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+              required:
+                - email
+                - password
+              additionalProperties: false
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Failed operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /movies:
+    post:
+      tags:
+        - movies
+      summary: Adds a movie to the db
+      description: Adds a movie to the db based on the movie title, releaseYear, genres, directors, producers, description, thumnail and image.
+      operationId: addMovie
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                releaseYear:
+                  type: integer
+                  minimum: 1910
+                  maximum: 2050
+                image:
+                  type: string
+                imageThumbnail:
+                  type: string
+                directors:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                producers:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                genres:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+              required:
+                - title
+                - description
+                - releaseYear
+                - image
+                - imageThumbnail
+                - directors
+                - producers
+                - genres
+              additionalProperties: false
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+        '401':
+          description: Failed operation
+        '400':
+          description: Failed operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    get:
+      tags:
+        - movies
+      summary: Returns movies based on query params
+      description: Returns movies based on query params (keyword, genres, deleted, sortBy, order, limit and offset)
+      operationId: getMovies
+      parameters:
+        - name: limit
+          in: query
+          description: Number of movies to return
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Number of movies to skip
+          schema:
+           type: string
+        - name: keyword
+          in: query
+          description: Param to search for a movie based on a keyword in title, directors and producers fields.
+          schema:
+           type: string
+        - name: sortBy
+          in: query
+          description: Param for specifying the sorting field
+          schema:
+           type: string
+        - name: order
+          in: query
+          description: Param for specifying the sort order
+          schema:
+           type: string
+        - name: deleted
+          in: query
+          description: Param to filter based on the soft deleted status
+          schema:
+           type: string
+        - name: genres
+          in: query
+          description: Param to filter based on required genres
+          schema:
+           type: array
+           minItems: 1
+           items:
+            type: string
+      responses:
+        '200':
+          description: Movies found
+          content:
+            application/json:
+              schema:
+               type: array
+               items:
+                type: object
+                properties: 
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  releaseYear:
+                    type: integer
+                    minimum: 1910
+                    maximum: 2050
+                  image:
+                    type: string
+                  imageThumbnail:
+                    type: string
+                  directors:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  producers:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  genres:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: string
+                  averageRating:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  deletedAt:
+                    type: string
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /movies/{id}:
+    get:
+      tags:
+        - movies
+      summary: Find movie by ID
+      description: Returns a single movie based on id.
+      operationId: getMovie
+      parameters:
+        - name: id
+          in: path
+          description: ID of movie to return
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Movie found
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  releaseYear:
+                    type: integer
+                    minimum: 1910
+                    maximum: 2050
+                  image:
+                    type: string
+                  imageThumbnail:
+                    type: string
+                  directors:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  producers:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  genres:
+                    type: array
+                    minItems: 1
+                    items:
+                      type: string
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  deletedAt:
+                    type: string
+                
+        '404':
+          description: Movie not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+    delete:
+      tags:
+        - movies
+      summary: Deletes a movie
+      description: Deletes a movie based on id.
+      operationId: deleteMovie
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Movie id to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Movie deleted
+        '401':
+          description: Failed operation
+        '404':
+          description: Movie not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+    put:
+        tags:
+          - movies
+        summary: Updates a movie
+        description: Updates a movie based on id.
+        operationId: updateMovie
+        parameters:
+          - name: id
+            in: path
+            description: Movie id to update
+            required: true
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  description:
+                    type: string
+                required:
+                 - description
+                additionalProperties: false
+
+          required: true
+        responses:
+          '204':
+            description: Movie updated
+          '401':
+            description: Failed operation
+          '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '404':
+            description: Movie not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+    patch:
+        tags:
+          - movies
+        summary: Updates a movie poster and thumbnail
+        description: Updates a movie thumbnail and poster based on id.
+        operationId: updateMoviePoster
+        security:
+          - bearerAuth: []
+        parameters:
+          - name: id
+            in: path
+            description: Movie id to update
+            required: true
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  image:
+                    type: string
+                  imageThumbnail:
+                    type: string
+                required:
+                  - image
+                  - imageThumbnail
+                additionalProperties: false
+          required: true
+        responses:
+          '204':
+            description: Movie updated
+          '401':
+            description: Failed operation
+          '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '400':
+            description: Bad input
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '404':
+            description: Movie not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+      
+
+  /movies/{id}/ratings:
+      get:
+        tags:
+          - movies
+        summary: Get movie ratings
+        description: Returns all reviews of a movie.
+        operationId: getMovieRatings
+        parameters:
+          - name: id
+            in: path
+            description: ID of movie
+            required: true
+            schema:
+              type: string
+        responses:
+          '200': 
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    type: object
+
+                  
+          '404':
+            description: Movie not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '500':
+              description: Failed operation
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+      post:
+        tags:
+          - movies
+        summary: Post a movie rating
+        description: Post a movie review (rating and review text).
+        operationId: addMovieRating
+        security:
+        - bearerAuth: []
+        parameters:
+          - name: id
+            in: path
+            description: ID of movie
+            required: true
+            schema:
+              type: string
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rating:
+                    type: integer
+                    minimum: 1
+                  review:
+                    type: string
+                required:
+                  - rating
+                  - review
+                additionalProperties: false
+          required: true
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+
+          '401':
+            description: Failed operation
+          '404':
+            description: Movie not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '400':
+            description: Bad input
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '500':
+              description: Failed operation
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+  /movies/restore/{id}:
+      patch:
+        tags:
+          - movies
+        summary: Restore a movie
+        description: Restore a movie after soft deletion.
+        operationId: restoreMovie
+        security:
+        - bearerAuth: []
+        parameters:
+          - name: id
+            in: path
+            description: ID of movie
+            required: true
+            schema:
+              type: string
+        responses:
+          '204':
+            description: Movie restored
+            content:
+              application/json:
+                schema:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+          '401':
+            description: Failed operation
+
+          '404':
+            description: Movie not found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+          '500':
+              description: Failed operation
+              content:
+                application/json:
+                  schema:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        
+  /ratings:
+    get:
+      tags:
+        - ratings
+      summary: Returns all ratings
+      description: Returns all ratings based on query params (deleted, limit, offset, )
+      operationId: getRatings
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of movies to return
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Number of movies to skip
+          schema:
+           type: string
+        - name: deleted
+          in: query
+          description: Param to filter based on the soft deleted status.
+          schema:
+           type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                 type: array
+                 items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    userId:
+                      type: integer
+                      minimum: 1910
+                      maximum: 2050
+                    movieId:
+                      type: integer
+                    rating:
+                      type: integer
+                    review:
+                      type: string
+                    createdAt:
+                      type: string
+                    updatedAt:
+                      type: string
+                    deletedAt:
+                      type: string
+        '400':
+          description: Failed operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /ratings/{id}:
+    get:
+      tags:
+        - ratings
+      summary: Returns the requested rating
+      description: Returns the requested rating based on an id
+      operationId: getRating
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Id of the requested rating
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  userId:
+                    type: integer
+                    minimum: 1910
+                    maximum: 2050
+                  movieId:
+                    type: integer
+                  rating:
+                    type: integer
+                  review:
+                    type: string
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  deletedAt:
+                    type: string
+        '401':
+            description: Failed operation
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags:
+        - ratings
+      summary: Deletes a rating
+      description: Deletes a rating based on an id
+      operationId: deleteRating
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Id of the rating to delete
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Rating deleted
+        '401':
+          description: Failed operation
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /ratings/restore/{id}:
+    patch:
+      tags:
+        - ratings
+      summary: Restores a rating
+      description: Restores a rating based on an id
+      operationId: restoreRating
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Id of the rating to restore
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Rating restored
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '404':
+          description: Rating not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /users:
+    get:
+      tags:
+        - users
+      summary: Returns users
+      description: Returns users based on query params (limit, offset, keyword, deleted)
+      operationId: getUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Number of users to return
+          schema:
+            type: string
+        - name: offset
+          in: query
+          description: Number of users to skip
+          schema:
+           type: string
+        - name: deleted
+          in: query
+          description: Param to filter based on the soft deleted status.
+          schema:
+           type: string
+        - name: keyword
+          in: query
+          description: Param to filter based on a keyword (email as of now).
+          schema:
+           type: string
+        
+      responses:
+        '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                   type: array
+                   minItems: 1
+                   items:
+                    type: object
+                    properties: 
+                      email:
+                        type: string
+                      id:
+                        type: integer
+                      roles:
+                        type: string
+                      createdAt:
+                        type: string
+                      updatedAt:
+                        type: string
+                      deletedAt:
+                        type: string
+                        
+        '400':
+            description: Failed operation
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+        '401':
+          description: Failed operation
+        '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /users/{id}:
+    delete:
+      tags:
+        - users
+      summary: Deletes a user
+      description: 'Deletes a user based on id.'
+      security:
+        - bearerAuth: []
+      operationId: deleteUser
+      parameters:
+        - name: id
+          in: path
+          description: User id to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted
+        '401':
+          description: Failed operation
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+    get:
+      tags:
+        - users
+      summary: Returns a user
+      description: 'Returns a user based on id.'
+      security:
+        - bearerAuth: []
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: User id to get
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  email:
+                    type: string
+                  id:
+                    type: integer
+                  roles:
+                    type: string
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  deletedAt:
+                    type: string
+        '401':
+          description: Failed operation
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      
+  /users/restore/{id}:
+    patch:
+      tags:
+        - users
+      summary: Restores a user
+      description: Restores a user based on an id.
+      operationId: restoreUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: Id of the user to restore
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: User restored
+        '401':
+          description: Failed operation
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /users/me/movies:
+    get:
+      tags:
+        - users
+      summary: Returns user rated/posted movies
+      description: Returns user rated/posted movies of the currently logged in user
+      operationId: getUserMovies
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type 
+          in: query
+          description: Type of the movies
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: User movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /users/me/password:
+    patch:
+      tags:
+        - users
+      summary: Updates user password
+      description: Updates user password based on old and new password.
+      operationId: updateUserPassword
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                newPassword:
+                  type: string
+                confirmPassword:
+                  type: string
+              required:
+                - password
+                - newPassword
+                - confirmPassword
+              additionalProperties: false
+
+        required: true
+      responses:
+        '204':
+          description: Password updated
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '500':
+            description: Server error
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+  /users/me:
+    put:
+      tags:
+        - users
+      summary: Updates user info
+      description: Updates user info (currently email)
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+              required:
+                - email
+              additionalProperties: false
+        required: true
+      responses:
+        '204':
+          description: User updated
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    delete:
+      tags:
+        - users
+      summary: Deletes user account
+      description: Deletes the account of the currently logged in user.
+      security:
+        - bearerAuth: []
+      operationId: deleteAccount
+      responses:
+        '204':
+          description: Account deleted
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Failed operation
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
