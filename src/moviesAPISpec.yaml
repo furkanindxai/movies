@@ -207,41 +207,46 @@ paths:
         - name: limit
           in: query
           description: Number of movies to return
+          allowEmptyValue: true
           schema:
             type: string
         - name: offset
           in: query
           description: Number of movies to skip
+          allowEmptyValue: true
           schema:
            type: string
         - name: keyword
+          allowReserved: true
           in: query
           description: Param to search for a movie based on a keyword in title, directors and producers fields.
           schema:
            type: string
+          allowEmptyValue: true
         - name: sortBy
+          allowEmptyValue: true
           in: query
           description: Param for specifying the sorting field
           schema:
            type: string
         - name: order
+          allowEmptyValue: true
           in: query
           description: Param for specifying the sort order
           schema:
            type: string
         - name: deleted
+          allowEmptyValue: true
           in: query
           description: Param to filter based on the soft deleted status
           schema:
            type: string
         - name: genres
+          allowReserved: true
           in: query
           description: Param to filter based on required genres
           schema:
-           type: array
-           minItems: 1
-           items:
-            type: string
+           type: string
       responses:
         '200':
           description: Movies found
@@ -733,7 +738,7 @@ paths:
       tags:
         - ratings
       summary: Returns all ratings
-      description: Returns all ratings based on query params (deleted, limit, offset, )
+      description: Returns all ratings based on query params (deleted, limit, offset)
       operationId: getRatings
       security:
         - bearerAuth: []
@@ -741,16 +746,19 @@ paths:
         - name: limit
           in: query
           description: Number of movies to return
+          allowEmptyValue: true
           schema:
             type: string
         - name: offset
           in: query
           description: Number of movies to skip
+          allowEmptyValue: true
           schema:
            type: string
         - name: deleted
           in: query
           description: Param to filter based on the soft deleted status.
+          allowEmptyValue: true
           schema:
            type: string
       responses:
@@ -990,21 +998,26 @@ paths:
         - name: limit
           in: query
           description: Number of users to return
+          allowEmptyValue: true
           schema:
             type: string
         - name: offset
           in: query
           description: Number of users to skip
+          allowEmptyValue: true
           schema:
            type: string
         - name: deleted
           in: query
           description: Param to filter based on the soft deleted status.
+          allowEmptyValue: true
           schema:
            type: string
         - name: keyword
           in: query
           description: Param to filter based on a keyword (email as of now).
+          allowEmptyValue: true
+          allowReserved: true
           schema:
            type: string
         
