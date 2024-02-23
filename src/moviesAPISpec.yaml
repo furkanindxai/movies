@@ -263,7 +263,7 @@ paths:
           description: Param to filter based on the soft deleted status, available to admin
           schema:
            type: string
-           enum: ["true", "false"]
+           enum: ["true", "false", ""]
            example: "true"
         - name: genres
           allowReserved: true
@@ -846,7 +846,7 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
-           enum: ["true", "false"]
+           enum: ["true", "false", ""]
            example: "true"
       responses:
         '200':
@@ -1117,7 +1117,7 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
-           enum: ["true", "false"]
+           enum: ["true", "false", ""]
            example: "true"
         - name: keyword
           in: query
