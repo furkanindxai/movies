@@ -260,10 +260,10 @@ paths:
         - name: deleted
           allowEmptyValue: true
           in: query
-          description: Param to filter based on the soft deleted status
+          description: Param to filter based on the soft deleted status, available to admin
           schema:
            type: string
-           enum: ["true", "false" , ""]
+           enum: ["true", "false"]
            example: "true"
         - name: genres
           allowReserved: true
@@ -698,7 +698,6 @@ paths:
             in: path
             description: ID of movie
             required: true
-            example: 2
             schema:
               type: string
         requestBody:
@@ -716,6 +715,7 @@ paths:
                     example: "An amazing movie!"
                 required:
                   - rating
+                  - review
                 additionalProperties: false
           required: true
         responses:
@@ -763,7 +763,7 @@ paths:
         tags:
           - movies
         summary: Restore a movie
-        description: Restore a movie after soft deletion.
+        description: Restore a movie after soft deletion. (for admin)
         operationId: restoreMovie
         security:
         - bearerAuth: []
@@ -821,7 +821,7 @@ paths:
       tags:
         - ratings
       summary: Returns all ratings
-      description: Returns all ratings based on query params (deleted, limit, offset)
+      description: Returns all ratings based on query params (deleted, limit, offset), for admin
       operationId: getRatings
       security:
         - bearerAuth: []
@@ -846,7 +846,7 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
-           enum: ["true", "false", ""]
+           enum: ["true", "false"]
            example: "true"
       responses:
         '200':
@@ -917,7 +917,7 @@ paths:
       tags:
         - ratings
       summary: Returns the requested rating
-      description: Returns the requested rating based on an id
+      description: Returns the requested rating based on an id (for admin)
       operationId: getRating
       security:
         - bearerAuth: []
@@ -994,7 +994,7 @@ paths:
       tags:
         - ratings
       summary: Deletes a rating
-      description: Deletes a rating based on an id
+      description: Deletes a rating based on an id (for admin)
       operationId: deleteRating
       security:
         - bearerAuth: []
@@ -1043,7 +1043,7 @@ paths:
       tags:
         - ratings
       summary: Restores a rating
-      description: Restores a rating based on an id
+      description: Restores a rating based on an id (for admin)
       operationId: restoreRating
       security:
         - bearerAuth: []
@@ -1092,7 +1092,7 @@ paths:
       tags:
         - users
       summary: Returns users
-      description: Returns users based on query params (limit, offset, keyword, deleted)
+      description: Returns users based on query params (limit, offset, keyword, deleted), for admin
       operationId: getUsers
       security:
         - bearerAuth: []
@@ -1117,7 +1117,7 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
-           enum: ["true", "false", ""]
+           enum: ["true", "false"]
            example: "true"
         - name: keyword
           in: query
@@ -1192,7 +1192,7 @@ paths:
       tags:
         - users
       summary: Deletes a user
-      description: 'Deletes a user based on id.'
+      description: 'Deletes a user based on id. (for admin)'
       security:
         - bearerAuth: []
       operationId: deleteUser
@@ -1240,7 +1240,7 @@ paths:
       tags:
         - users
       summary: Returns a user
-      description: 'Returns a user based on id.'
+      description: 'Returns a user based on id. (for admin)'
       security:
         - bearerAuth: []
       operationId: getUser
@@ -1313,7 +1313,7 @@ paths:
       tags:
         - users
       summary: Restores a user
-      description: Restores a user based on an id.
+      description: Restores a user based on an id (for admin).
       operationId: restoreUser
       security:
         - bearerAuth: []
