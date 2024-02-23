@@ -21,8 +21,10 @@ paths:
               properties:
                 email:
                   type: string
+                  example: "feynman@indx.ai"
                 password:
                   type: string
+                  example: "hello"
               required:
                 - email
                 - password
@@ -39,13 +41,16 @@ paths:
                 properties:
                   token:
                     type: string
+                    example: "x112dhjdsjhdsj"
                   id:
                     type: integer
                     minimum: 1
                   roles:
                     type: string
+                    example: "user, admin"
                   email:
                     type: string
+                    example: "feynman@indx.ai"
         '401':
           description: Failed operation
           content:
@@ -79,8 +84,10 @@ paths:
               properties:
                 email:
                   type: string
+                  example: "feynman@indx.ai"
                 password:
                   type: string
+                  example: "hello"
               required:
                 - email
                 - password
@@ -131,28 +138,36 @@ paths:
               properties:
                 title:
                   type: string
+                  example: "Oppenheimer"
                 description:
                   type: string
+                  example: "A movie about the first atomic bomb"
                 releaseYear:
                   type: integer
+                  example: 2023
                   minimum: 1910
                   maximum: 2050
                 image:
                   type: string
+                  example: "google.com"
                 imageThumbnail:
                   type: string
+                  example: "google.com"
                 directors:
                   type: array
                   minItems: 1
+                  example: ["nolan"]
                   items:
                     type: string
                 producers:
                   type: array
                   minItems: 1
+                  example: ["nolan"]
                   items:
                     type: string
                 genres:
                   type: array
+                  example: ["action"]
                   minItems: 1
                   items:
                     type: string
@@ -210,18 +225,21 @@ paths:
           allowEmptyValue: true
           schema:
             type: string
+            example: 14
         - name: offset
           in: query
           description: Number of movies to skip
           allowEmptyValue: true
           schema:
            type: string
+           example: 14
         - name: keyword
           allowReserved: true
           in: query
           description: Param to search for a movie based on a keyword in title, directors and producers fields.
           schema:
            type: string
+           example: "star"
           allowEmptyValue: true
         - name: sortBy
           allowEmptyValue: true
@@ -229,27 +247,34 @@ paths:
           description: Param for specifying the sorting field
           schema:
            type: string
+           enum: [title, releaseYear]
+           example: "title"
         - name: order
           allowEmptyValue: true
           in: query
           description: Param for specifying the sort order
           schema:
            type: string
+           enum: [asc, desc]
+           example: "asc"
         - name: deleted
           allowEmptyValue: true
           in: query
           description: Param to filter based on the soft deleted status
           schema:
            type: string
+           enum: ["true", "false" , ""]
+           example: "true"
         - name: genres
           allowReserved: true
           in: query
           description: Param to filter based on required genres
           schema:
            type: string
+           example: "action,adventure"
       responses:
         '200':
-          description: Movies found
+          description: Movies found (deletedAt field will only be visible to admin)
           content:
             application/json:
               schema:
@@ -259,39 +284,51 @@ paths:
                 properties: 
                   title:
                     type: string
+                    example: "Oppenheimer"
                   description:
                     type: string
+                    example: "A movie about the maker of the first atomic bomb"
                   releaseYear:
                     type: integer
+                    example: 2023
                     minimum: 1910
                     maximum: 2050
                   image:
                     type: string
+                    example: "google.com"
                   imageThumbnail:
                     type: string
+                    example: "google.com"
                   directors:
                     type: array
+                    example: ["Nolan"]
                     minItems: 1
                     items:
                       type: string
                   producers:
                     type: array
+                    example: ["Nolan"]
                     minItems: 1
                     items:
                       type: string
                   genres:
                       type: array
+                      example: ["Biographical"]
                       minItems: 1
                       items:
                         type: string
                   averageRating:
                     type: number
+                    example: 4.5
                   createdAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   updatedAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   deletedAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
         '400':
           description: Invalid input
           content:
@@ -324,9 +361,10 @@ paths:
           required: true
           schema:
             type: string
+            example: "2"
       responses:
         '200':
-          description: Movie found
+          description: Movie found (deletedAt field will only be visible to admin)
           content:
             application/json:
               schema:
@@ -334,38 +372,51 @@ paths:
                 properties:
                   title:
                     type: string
+                    example: "Oppenheimer"
                   description:
                     type: string
+                    example: "A movie about the maker of the first atomic bomb"
                   releaseYear:
                     type: integer
+                    example: 2023
                     minimum: 1910
                     maximum: 2050
                   image:
                     type: string
+                    example: "google.com"
                   imageThumbnail:
                     type: string
+                    example: "google.com"
                   directors:
                     type: array
+                    example: ["Nolan"]
                     minItems: 1
                     items:
                       type: string
                   producers:
                     type: array
+                    example: ["Nolan"]
                     minItems: 1
                     items:
                       type: string
                   genres:
-                    type: array
-                    minItems: 1
-                    items:
-                      type: string
+                      type: array
+                      example: ["Biographical"]
+                      minItems: 1
+                      items:
+                        type: string
+                  averageRating:
+                    type: number
+                    example: 4.5
                   createdAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   updatedAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   deletedAt:
                     type: string
-                
+                    example: "2024-01-22 10:24:10.633+05:30"
         '404':
           description: Movie not found
           content:
@@ -395,6 +446,7 @@ paths:
       parameters:
         - name: id
           in: path
+          example: 2
           description: Movie id to delete
           required: true
           schema:
@@ -440,6 +492,7 @@ paths:
         parameters:
           - name: id
             in: path
+            example: 2
             description: Movie id to update
             required: true
             schema:
@@ -452,6 +505,7 @@ paths:
                 properties:
                   description:
                     type: string
+                    example: "A movie about humanity."
                 required:
                  - description
                 additionalProperties: false
@@ -502,6 +556,7 @@ paths:
             in: path
             description: Movie id to update
             required: true
+            example: 2
             schema:
               type: string
         requestBody:
@@ -512,8 +567,10 @@ paths:
                 properties:
                   image:
                     type: string
+                    example: "google.com"
                   imageThumbnail:
                     type: string
+                    example: "google.com"
                 required:
                   - image
                   - imageThumbnail
@@ -574,18 +631,41 @@ paths:
             in: path
             description: ID of movie
             required: true
+            example: "1"
             schema:
               type: string
         responses:
           '200': 
-            description: Successful operation
+            description: Successful operation (only the admin has the access to the deletedAt property)
             content:
               application/json:
                 schema:
-                  type: array
-                  items:
-                    type: object
-
+                 type: object
+                 properties:
+                  id:
+                    type: integer
+                    example: 1
+                  userId:
+                    type: integer
+                    example: 1
+                  movieId:
+                    type: integer
+                    example: 1
+                  rating:
+                    type: integer
+                    example: 4
+                  review:
+                    type: string
+                    example: "An amazing movie!"
+                  createdAt:
+                    type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
+                  updatedAt:
+                    type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
+                  deletedAt:
+                    type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   
           '404':
             description: Movie not found
@@ -618,6 +698,7 @@ paths:
             in: path
             description: ID of movie
             required: true
+            example: 2
             schema:
               type: string
         requestBody:
@@ -628,12 +709,13 @@ paths:
                 properties:
                   rating:
                     type: integer
+                    example: 4
                     minimum: 1
                   review:
                     type: string
+                    example: "An amazing movie!"
                 required:
                   - rating
-                  - review
                 additionalProperties: false
           required: true
         responses:
@@ -690,6 +772,7 @@ paths:
             in: path
             description: ID of movie
             required: true
+            example: 1
             schema:
               type: string
         responses:
@@ -744,6 +827,7 @@ paths:
         - bearerAuth: []
       parameters:
         - name: limit
+          example: 14
           in: query
           description: Number of movies to return
           allowEmptyValue: true
@@ -751,6 +835,7 @@ paths:
             type: string
         - name: offset
           in: query
+          example: 14
           description: Number of movies to skip
           allowEmptyValue: true
           schema:
@@ -761,6 +846,8 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
+           enum: ["true", "false", ""]
+           example: "true"
       responses:
         '200':
           description: Successful operation
@@ -773,22 +860,28 @@ paths:
                   properties:
                     id:
                       type: integer
+                      example: 1
                     userId:
                       type: integer
-                      minimum: 1910
-                      maximum: 2050
+                      example: 1
                     movieId:
                       type: integer
+                      example: 1
                     rating:
                       type: integer
+                      example: 4
                     review:
                       type: string
+                      example: "An amazing movie!"
                     createdAt:
                       type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
                     updatedAt:
                       type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
                     deletedAt:
                       type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
         '400':
           description: Failed operation
           content:
@@ -832,6 +925,7 @@ paths:
         - name: id
           in: path
           description: Id of the requested rating
+          example: 1
           schema:
             type: string
           required: true
@@ -843,24 +937,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                  userId:
-                    type: integer
-                    minimum: 1910
-                    maximum: 2050
-                  movieId:
-                    type: integer
-                  rating:
-                    type: integer
-                  review:
-                    type: string
-                  createdAt:
-                    type: string
-                  updatedAt:
-                    type: string
-                  deletedAt:
-                    type: string
+                    id:
+                      type: integer
+                      example: 1
+                    userId:
+                      type: integer
+                      example: 1
+                    movieId:
+                      type: integer
+                      example: 1
+                    rating:
+                      type: integer
+                      example: 4
+                    review:
+                      type: string
+                      example: "An amazing movie!"
+                    createdAt:
+                      type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
+                    updatedAt:
+                      type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
+                    deletedAt:
+                      type: string
+                      example: "2024-01-22 10:24:10.633+05:30"
         '401':
             description: Failed operation
         '403':
@@ -905,6 +1005,7 @@ paths:
           schema:
             type: string
           required: true
+          example: 2
       responses:
         '204':
           description: Rating deleted
@@ -953,6 +1054,7 @@ paths:
           schema:
             type: string
           required: true
+          example: 7
       responses:
         '204':
           description: Rating restored
@@ -999,12 +1101,14 @@ paths:
           in: query
           description: Number of users to return
           allowEmptyValue: true
+          example: 14
           schema:
             type: string
         - name: offset
           in: query
           description: Number of users to skip
           allowEmptyValue: true
+          example: 14
           schema:
            type: string
         - name: deleted
@@ -1013,8 +1117,11 @@ paths:
           allowEmptyValue: true
           schema:
            type: string
+           enum: ["true", "false", ""]
+           example: "true"
         - name: keyword
           in: query
+          example: "user1@indx.ai"
           description: Param to filter based on a keyword (email as of now).
           allowEmptyValue: true
           allowReserved: true
@@ -1023,7 +1130,7 @@ paths:
         
       responses:
         '200':
-            description: Successful operation
+            description: Successful operation (only accessible to admin)
             content:
               application/json:
                 schema:
@@ -1034,16 +1141,22 @@ paths:
                     properties: 
                       email:
                         type: string
+                        example: "feynman@indx.ai"
                       id:
                         type: integer
+                        example: 1
                       roles:
                         type: string
+                        example: "user, admin"
                       createdAt:
                         type: string
+                        example: "2024-01-22 10:24:10.633+05:30"
                       updatedAt:
                         type: string
+                        example: "2024-01-22 10:24:10.633+05:30"
                       deletedAt:
                         type: string
+                        example: "2024-01-22 10:24:10.633+05:30"
                         
         '400':
             description: Failed operation
@@ -1086,6 +1199,7 @@ paths:
       parameters:
         - name: id
           in: path
+          example: 1
           description: User id to delete
           required: true
           schema:
@@ -1133,6 +1247,7 @@ paths:
       parameters:
         - name: id
           in: path
+          example: 1
           description: User id to get
           required: true
           schema:
@@ -1147,16 +1262,22 @@ paths:
                 properties: 
                   email:
                     type: string
+                    example: "feynman@indx.ai"
                   id:
                     type: integer
+                    example: 1
                   roles:
                     type: string
+                    example: "user, admin"
                   createdAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   updatedAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
                   deletedAt:
                     type: string
+                    example: "2024-01-22 10:24:10.633+05:30"
         '401':
           description: Failed operation
         '404':
@@ -1199,6 +1320,7 @@ paths:
       parameters:
         - name: id
           in: path
+          example: 1
           description: Id of the user to restore
           schema:
             type: string
@@ -1259,7 +1381,139 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
+                   oneOf:
+                    - type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          userId:
+                            type: integer
+                            example: 1
+                          rating:
+                            type: integer
+                            example: 3.5
+                          review:
+                            type: string
+                            example: "An amazing movie!"
+                          createdAt:
+                            type: string
+                            example: "2024-02-02T09:31:33.431Z"
+                          updatedAt: 
+                            type: string
+                            example: "2024-02-02T09:31:33.431Z"
+                          deletedAt:
+                            type: string
+                            example: "2024-02-02T09:31:33.431Z"
+                          Movie:
+                             type: object
+                             properties:
+                              title:
+                                type: string
+                                example: "Oppenheimer"
+                              description:
+                                type: string
+                                example: "A movie about the maker of the first atomic bomb"
+                              releaseYear:
+                                type: integer
+                                example: 2023
+                                minimum: 1910
+                                maximum: 2050
+                              image:
+                                type: string
+                                example: "google.com"
+                              imageThumbnail:
+                                type: string
+                                example: "google.com"
+                              directors:
+                                type: array
+                                example: ["Nolan"]
+                                minItems: 1
+                                items:
+                                  type: string
+                              producers:
+                                type: array
+                                example: ["Nolan"]
+                                minItems: 1
+                                items:
+                                  type: string
+                              genres:
+                                  type: array
+                                  example: ["Biographical"]
+                                  minItems: 1
+                                  items:
+                                    type: string
+                              averageRating:
+                                type: number
+                                example: 4.5
+                              createdAt:
+                                type: string
+                                example: "2024-01-22 10:24:10.633+05:30"
+                              updatedAt:
+                                type: string
+                                example: "2024-01-22 10:24:10.633+05:30"
+                              deletedAt:
+                                type: string
+                                example: "2024-01-22 10:24:10.633+05:30"
+                          
+                    - type: array
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: "Oppenheimer"
+                          description:
+                            type: string
+                            example: "A movie about the maker of the first atomic bomb"
+                          releaseYear:
+                            type: integer
+                            example: 2023
+                            minimum: 1910
+                            maximum: 2050
+                          image:
+                            type: string
+                            example: "google.com"
+                          imageThumbnail:
+                            type: string
+                            example: "google.com"
+                          directors:
+                            type: array
+                            example: ["Nolan"]
+                            minItems: 1
+                            items:
+                              type: string
+                          producers:
+                            type: array
+                            example: ["Nolan"]
+                            minItems: 1
+                            items:
+                              type: string
+                          genres:
+                              type: array
+                              example: ["Biographical"]
+                              minItems: 1
+                              items:
+                                type: string
+                          averageRating:
+                            type: number
+                            example: 4.5
+                          createdAt:
+                            type: string
+                            example: "2024-01-22 10:24:10.633+05:30"
+                          updatedAt:
+                            type: string
+                            example: "2024-01-22 10:24:10.633+05:30"
+                          deletedAt:
+                            type: string
+                            example: "2024-01-22 10:24:10.633+05:30"
+
+                  
+                  
+                  
+                  
         '400':
           description: Invalid input
           content:
@@ -1297,10 +1551,13 @@ paths:
               properties:
                 password:
                   type: string
+                  example: "hello"
                 newPassword:
                   type: string
+                  example: "roses"
                 confirmPassword:
                   type: string
+                  example: "roses"
               required:
                 - password
                 - newPassword
@@ -1348,6 +1605,7 @@ paths:
               properties:
                 email:
                   type: string
+                  example: abc@indx.ai
               required:
                 - email
               additionalProperties: false
