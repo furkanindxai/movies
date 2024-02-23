@@ -4,7 +4,7 @@ info:
   description: Movies API is a practice project that I built as part of my training at indx.ai.
   version: '1'
 servers:
-  - url: http://127.0.0.1:3000/api/v1
+  - url: http://localhost:3000/api/v1
 paths:
   /auth/signin:
     post:
