@@ -247,7 +247,7 @@ paths:
           description: Param for specifying the sorting field
           schema:
            type: string
-           enum: [title, releaseYear]
+           enum: [title, releaseYear, ""]
            example: "title"
         - name: order
           allowEmptyValue: true
@@ -255,7 +255,7 @@ paths:
           description: Param for specifying the sort order
           schema:
            type: string
-           enum: [asc, desc]
+           enum: [asc, desc, ""]
            example: "asc"
         - name: deleted
           allowEmptyValue: true
@@ -267,6 +267,7 @@ paths:
            example: "true"
         - name: genres
           allowReserved: true
+          allowEmptyValue: true
           in: query
           description: Param to filter based on required genres
           schema:
